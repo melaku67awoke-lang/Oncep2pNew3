@@ -12,7 +12,7 @@ const DATA = path.join(__dirname, 'data');
 const UPLOADS = path.join(__dirname, 'uploads');
 for (const d of [DATA, UPLOADS]) fs.mkdirSync(d, { recursive: true });
 
-const files = { users: 'users.json', kyc: 'kyc.json', wallets: 'wallets.json', tx: 'transactions.json', listings: 'listings.json', orders: 'orders.json', sessions:'sessions.json', messages:'messages.json', notifications:'notifications.json' };
+const files = { users: 'users.json', kyc: 'kyc.json', wallets: 'wallets.json', transactions: 'transactions.json'', listings: 'listings.json', orders: 'orders.json', sessions:'sessions.json', messages:'messages.json', notifications:'notifications.json' };
 function read(name) { const p = path.join(DATA, files[name]); if (!fs.existsSync(p)) fs.writeFileSync(p, '[]'); return JSON.parse(fs.readFileSync(p, 'utf8')); }
 function write(name, value) { fs.writeFileSync(path.join(DATA, files[name]), JSON.stringify(value, null, 2)); }
 function id(prefix) { return prefix + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
