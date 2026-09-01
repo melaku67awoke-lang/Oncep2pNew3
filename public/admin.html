@@ -1,1 +1,778 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Once P2P Admin</title><style>body{font-family:Arial;background:#f5f7fb;margin:0;color:#172033}main{max-width:1100px;margin:25px auto;padding:0 18px}.card{background:#fff;padding:18px;border-radius:14px;margin:15px 0;box-shadow:0 2px 12px #0001}input,button,select{padding:10px;margin:4px;border:1px solid #ccd3df;border-radius:8px}button{background:#111827;color:#fff;cursor:pointer}.ok{background:#087443}.danger{background:#b42318}</style></head><body><main><h1>Once P2P Admin</h1><div class="card"><input id="key" placeholder="Admin key"><button onclick="loadAll()">Open Admin</button><p>Keep the admin key server-side in production; this panel is for development.</p></div><div id="app"></div><script>let K='';async function api(u,o={}){o.headers={...(o.headers||{}),'x-admin-key':K};const r=await fetch(u,o),d=await r.json();if(!r.ok)throw Error(d.error||'Failed');return d}async function loadAll(){K=document.querySelector('#key').value;try{const [k,w,o]=await Promise.all([api('/api/admin/kyc'),api('/api/admin/wallet-requests'),api('/api/admin/orders')]);document.querySelector('#app').innerHTML='<div class="card"><h2>KYC</h2>'+k.map(x=>'<div><b>'+x.userId+'</b> — '+x.status+' — '+x.id+' <button onclick="reviewK(\''+x.id+'\',\'approved\')">Approve</button><button class="danger" onclick="reviewK(\''+x.id+'\',\'rejected\')">Reject</button></div>').join('')+'</div><div class="card"><h2>Wallet requests</h2>'+w.map(x=>'<div>'+x.userId+' — '+x.type+' — '+x.amount+' — '+x.status+' '+(x.status==='pending'?'<button onclick="reviewW(\''+x.id+'\',\'completed\')">Approve</button><button class="danger" onclick="reviewW(\''+x.id+'\',\'rejected\')">Reject</button>':'')+'</div>').join('')+'</div><div class="card"><h2>Orders & disputes</h2>'+o.map(x=>'<div>'+x.id+' — '+x.title+' — '+x.status+(x.status==='disputed'?' <button onclick="resolve(\''+x.id+'\',\'refund_buyer\')">Refund buyer</button><button class="ok" onclick="resolve(\''+x.id+'\',\'release_seller\')">Release seller</button>':'')+'</div>').join('')+'</div>'}catch(e){alert(e.message)}}async function reviewK(id,status){let reason=status==='rejected'?prompt('Rejection reason')||'':'';await api('/api/admin/kyc/'+id+'/review',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({status,reason})});loadAll()}async function reviewW(id,status){await api('/api/admin/wallet-requests/'+id+'/review',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({status})});loadAll()}async function resolve(id,decision){const reason=prompt('Resolution note')||'';await api('/api/admin/orders/'+id+'/resolve',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({decision,reason})});loadAll()}</script></main></body></html>
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Once P2P Admin</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f7fb;
+      margin: 0;
+      color: #172033;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 25px auto;
+      padding: 0 18px;
+    }
+
+    .card {
+      background: #fff;
+      padding: 18px;
+      border-radius: 14px;
+      margin: 15px 0;
+      box-shadow: 0 2px 12px #0001;
+    }
+
+    .menu-card {
+      cursor: pointer;
+      transition: transform .15s, box-shadow .15s;
+    }
+
+    .menu-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 18px #0002;
+    }
+
+    .menu-card h2 {
+      margin: 0;
+    }
+
+    .section {
+      display: none;
+    }
+
+    input,
+    button,
+    select,
+    textarea {
+      padding: 10px;
+      margin: 4px;
+      border: 1px solid #ccd3df;
+      border-radius: 8px;
+      box-sizing: border-box;
+    }
+
+    button {
+      background: #111827;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: .9;
+    }
+
+    .ok {
+      background: #087443;
+    }
+
+    .danger {
+      background: #b42318;
+    }
+
+    .back {
+      background: #475467;
+      margin-bottom: 12px;
+    }
+
+    .kyc-item,
+    .request-item,
+    .order-item {
+      border: 1px solid #e1e5ec;
+      border-radius: 12px;
+      padding: 15px;
+      margin: 12px 0;
+      background: #fafbfc;
+    }
+
+    .pending {
+      color: #b54708;
+      font-weight: bold;
+    }
+
+    .approved {
+      color: #087443;
+      font-weight: bold;
+    }
+
+    .rejected {
+      color: #b42318;
+      font-weight: bold;
+    }
+
+    .docs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .docs a {
+      display: inline-block;
+      padding: 9px 12px;
+      background: #e8eef8;
+      border-radius: 8px;
+      color: #172033;
+      text-decoration: none;
+    }
+
+    .details {
+      line-height: 1.7;
+    }
+
+    .empty {
+      padding: 20px;
+      text-align: center;
+      color: #667085;
+    }
+
+    .error {
+      color: #b42318;
+      background: #fff0ef;
+      padding: 12px;
+      border-radius: 8px;
+      margin: 10px 0;
+    }
+  </style>
+</head>
+
+<body>
+
+<main>
+
+  <h1>Once P2P Admin</h1>
+
+  <!-- ADMIN LOGIN -->
+  <div class="card">
+    <input
+      id="key"
+      type="password"
+      placeholder="Admin key"
+    >
+
+    <button onclick="loadAll()">
+      Open Admin
+    </button>
+
+    <p>
+      Keep the admin key server-side in production;
+      this panel is for development.
+    </p>
+  </div>
+
+  <!-- MAIN MENU -->
+  <div id="menu" style="display:none">
+
+    <div class="card menu-card" onclick="openSection('kycSection')">
+      <h2>KYC</h2>
+      <p>Review identity verification submissions.</p>
+    </div>
+
+    <div class="card menu-card" onclick="openSection('walletSection')">
+      <h2>Wallet requests</h2>
+      <p>Review deposits and withdrawals.</p>
+    </div>
+
+    <div class="card menu-card" onclick="openSection('ordersSection')">
+      <h2>Orders & disputes</h2>
+      <p>Manage orders and resolve disputes.</p>
+    </div>
+
+  </div>
+
+  <!-- KYC -->
+  <div id="kycSection" class="section">
+
+    <button class="back" onclick="showMenu()">
+      ← Back
+    </button>
+
+    <div class="card">
+      <h2>KYC</h2>
+      <div id="kycList">
+        Loading...
+      </div>
+    </div>
+
+  </div>
+
+  <!-- WALLET -->
+  <div id="walletSection" class="section">
+
+    <button class="back" onclick="showMenu()">
+      ← Back
+    </button>
+
+    <div class="card">
+      <h2>Wallet requests</h2>
+      <div id="walletList">
+        Loading...
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ORDERS -->
+  <div id="ordersSection" class="section">
+
+    <button class="back" onclick="showMenu()">
+      ← Back
+    </button>
+
+    <div class="card">
+      <h2>Orders & disputes</h2>
+      <div id="ordersList">
+        Loading...
+      </div>
+    </div>
+
+  </div>
+
+</main>
+
+<script>
+
+let K = '';
+
+/* =========================================================
+   API
+========================================================= */
+
+async function api(url, options = {}) {
+
+  options.headers = {
+    ...(options.headers || {}),
+    'x-admin-key': K
+  };
+
+  const response = await fetch(url, options);
+
+  let data;
+
+  try {
+    data = await response.json();
+  } catch {
+    throw new Error('Invalid server response');
+  }
+
+  if (!response.ok) {
+    throw new Error(
+      data.error || 'Request failed'
+    );
+  }
+
+  return data;
+}
+
+/* =========================================================
+   LOAD ADMIN
+========================================================= */
+
+async function loadAll() {
+
+  K = document.querySelector('#key').value.trim();
+
+  if (!K) {
+    alert('Enter the admin key');
+    return;
+  }
+
+  document.querySelector('#menu').style.display = 'block';
+
+  try {
+
+    /*
+      Load each section independently.
+      One failing API will not prevent KYC
+      from appearing.
+    */
+
+    try {
+      const kyc = await api('/api/admin/kyc');
+      renderKYC(kyc);
+    } catch (e) {
+      document.querySelector('#kycList').innerHTML =
+        '<div class="error">' +
+        escapeHtml(e.message) +
+        '</div>';
+    }
+
+    try {
+      const wallet = await api('/api/admin/wallet-requests');
+      renderWallet(wallet);
+    } catch (e) {
+      document.querySelector('#walletList').innerHTML =
+        '<div class="error">' +
+        escapeHtml(e.message) +
+        '</div>';
+    }
+
+    try {
+      const orders = await api('/api/admin/orders');
+      renderOrders(orders);
+    } catch (e) {
+      document.querySelector('#ordersList').innerHTML =
+        '<div class="error">' +
+        escapeHtml(e.message) +
+        '</div>';
+    }
+
+  } catch (e) {
+    alert(e.message);
+  }
+}
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+function showMenu() {
+
+  document.querySelector('#menu').style.display = 'block';
+
+  document.querySelectorAll('.section').forEach(
+    section => {
+      section.style.display = 'none';
+    }
+  );
+}
+
+function openSection(id) {
+
+  document.querySelector('#menu').style.display = 'none';
+
+  document.querySelectorAll('.section').forEach(
+    section => {
+      section.style.display = 'none';
+    }
+  );
+
+  document.querySelector('#' + id).style.display = 'block';
+}
+
+/* =========================================================
+   KYC
+========================================================= */
+
+function renderKYC(data) {
+
+  const container =
+    document.querySelector('#kycList');
+
+  if (!data.length) {
+    container.innerHTML =
+      '<div class="empty">No KYC submissions.</div>';
+    return;
+  }
+
+  container.innerHTML = data.map(k => {
+
+    const statusClass =
+      k.status === 'approved'
+        ? 'approved'
+        : k.status === 'rejected'
+        ? 'rejected'
+        : 'pending';
+
+    return `
+      <div class="kyc-item">
+
+        <div class="details">
+
+          <b>User ID:</b>
+          ${escapeHtml(k.userId)}
+          <br>
+
+          <b>KYC ID:</b>
+          ${escapeHtml(k.id)}
+          <br>
+
+          <b>Full name:</b>
+          ${escapeHtml(k.fullName || '')}
+          <br>
+
+          <b>Date of birth:</b>
+          ${escapeHtml(k.dob || '')}
+          <br>
+
+          <b>Address:</b>
+          ${escapeHtml(k.address || '')}
+          <br>
+
+          <b>ID type:</b>
+          ${escapeHtml(k.idType || '')}
+          <br>
+
+          <b>ID number:</b>
+          ${escapeHtml(k.idNumber || '')}
+          <br>
+
+          <b>Status:</b>
+          <span class="${statusClass}">
+            ${escapeHtml(k.status)}
+          </span>
+
+        </div>
+
+        <div class="docs">
+
+          ${
+            k.idDocument
+              ? `<a
+                  href="${safeUrl(k.idDocument)}"
+                  target="_blank"
+                  rel="noopener">
+                  View ID document
+                </a>`
+              : ''
+          }
+
+          ${
+            k.selfie
+              ? `<a
+                  href="${safeUrl(k.selfie)}"
+                  target="_blank"
+                  rel="noopener">
+                  View selfie
+                </a>`
+              : ''
+          }
+
+        </div>
+
+        ${
+          k.status === 'pending'
+          ? `
+            <div style="margin-top:12px">
+
+              <button
+                class="ok"
+                onclick="reviewK('${escapeAttr(k.id)}','approved')">
+                Approve
+              </button>
+
+              <button
+                class="danger"
+                onclick="reviewK('${escapeAttr(k.id)}','rejected')">
+                Reject
+              </button>
+
+            </div>
+          `
+          : ''
+        }
+
+        ${
+          k.reason
+          ? `
+            <p>
+              <b>Reason:</b>
+              ${escapeHtml(k.reason)}
+            </p>
+          `
+          : ''
+        }
+
+      </div>
+    `;
+
+  }).join('');
+}
+
+/* =========================================================
+   REVIEW KYC
+========================================================= */
+
+async function reviewK(id, status) {
+
+  let reason = '';
+
+  if (status === 'rejected') {
+
+    reason =
+      prompt('Rejection reason') || '';
+
+  }
+
+  try {
+
+    await api(
+      '/api/admin/kyc/' +
+      encodeURIComponent(id) +
+      '/review',
+      {
+        method: 'POST',
+
+        headers: {
+          'Content-Type':
+            'application/json'
+        },
+
+        body: JSON.stringify({
+          status,
+          reason
+        })
+      }
+    );
+
+    const kyc =
+      await api('/api/admin/kyc');
+
+    renderKYC(kyc);
+
+    alert(
+      status === 'approved'
+        ? 'KYC approved'
+        : 'KYC rejected'
+    );
+
+  } catch (e) {
+
+    alert(e.message);
+
+  }
+}
+
+/* =========================================================
+   WALLET
+========================================================= */
+
+function renderWallet(data) {
+
+  const container =
+    document.querySelector('#walletList');
+
+  if (!data.length) {
+
+    container.innerHTML =
+      '<div class="empty">No wallet requests.</div>';
+
+    return;
+  }
+
+  container.innerHTML = data.map(x => {
+
+    return `
+      <div class="request-item">
+
+        <b>User:</b>
+        ${escapeHtml(x.userId)}
+        <br>
+
+        <b>Type:</b>
+        ${escapeHtml(x.type)}
+        <br>
+
+        <b>Amount:</b>
+        ${Number(x.amount || 0).toFixed(2)} ETB
+        <br>
+
+        <b>Status:</b>
+        ${escapeHtml(x.status)}
+
+        ${
+          x.status === 'pending'
+          ? `
+            <div style="margin-top:10px">
+
+              <button
+                class="ok"
+                onclick="reviewW('${escapeAttr(x.id)}','completed')">
+                Approve
+              </button>
+
+              <button
+                class="danger"
+                onclick="reviewW('${escapeAttr(x.id)}','rejected')">
+                Reject
+              </button>
+
+            </div>
+          `
+          : ''
+        }
+
+      </div>
+    `;
+
+  }).join('');
+}
+
+async function reviewW(id, status) {
+
+  try {
+
+    await api(
+      '/api/admin/wallet-requests/' +
+      encodeURIComponent(id) +
+      '/review',
+      {
+        method: 'POST',
+
+        headers: {
+          'Content-Type':
+            'application/json'
+        },
+
+        body: JSON.stringify({
+          status
+        })
+      }
+    );
+
+    const wallet =
+      await api('/api/admin/wallet-requests');
+
+    renderWallet(wallet);
+
+  } catch (e) {
+
+    alert(e.message);
+
+  }
+}
+
+/* =========================================================
+   ORDERS
+========================================================= */
+
+function renderOrders(data) {
+
+  const container =
+    document.querySelector('#ordersList');
+
+  if (!data.length) {
+
+    container.innerHTML =
+      '<div class="empty">No orders.</div>';
+
+    return;
+  }
+
+  container.innerHTML = data.map(x => {
+
+    return `
+      <div class="order-item">
+
+        <b>Order:</b>
+        ${escapeHtml(x.id)}
+        <br>
+
+        <b>Title:</b>
+        ${escapeHtml(x.title || '')}
+        <br>
+
+        <b>Amount:</b>
+        ${Number(x.amount || 0).toFixed(2)} ETB
+        <br>
+
+        <b>Status:</b>
+        ${escapeHtml(x.status)}
+
+        ${
+          x.status === 'disputed'
+          ? `
+            <div style="margin-top:10px">
+
+              <button
+                onclick="resolve('${escapeAttr(x.id)}','refund_buyer')">
+                Refund buyer
+              </button>
+
+              <button
+                class="ok"
+                onclick="resolve('${escapeAttr(x.id)}','release_seller')">
+                Release seller
+              </button>
+
+            </div>
+          `
+          : ''
+        }
+
+      </div>
+    `;
+
+  }).join('');
+}
+
+async function resolve(id, decision) {
+
+  const reason =
+    prompt('Resolution note') || '';
+
+  try {
+
+    await api(
+      '/api/admin/orders/' +
+      encodeURIComponent(id) +
+      '/resolve',
+      {
+        method: 'POST',
+
+        headers: {
+          'Content-Type':
+            'application/json'
+        },
+
+        body: JSON.stringify({
+          decision,
+          reason
+        })
+      }
+    );
+
+    const orders =
+      await api('/api/admin/orders');
+
+    renderOrders(orders);
+
+  } catch (e) {
+
+    alert(e.message);
+
+  }
+}
+
+/* =========================================================
+   SECURITY HELPERS
+========================================================= */
+
+function escapeHtml(value) {
+
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function escapeAttr(value) {
+
+  return String(value ?? '')
+    .replace(/\\/g, '\\\\')
+    .replace(/'/g, "\\'");
+}
+
+function safeUrl(value) {
+
+  const url = String(value || '');
+
+  if (
+    url.startsWith('/uploads/')
+  ) {
+    return url;
+  }
+
+  return '#';
+}
+
+</script>
+
+</body>
+</html>
