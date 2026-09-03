@@ -191,6 +191,7 @@ function safeUser(user) {
     userId: user.userId,
     username: user.username,
     fullName: user.fullName,
+    telegramId: user.telegramId || '',
     createdAt: user.createdAt
   };
 }
@@ -331,15 +332,6 @@ app.use(
   })
 );
 
-/*
-  Public uploads are kept because the existing application
-  expects /uploads/... paths.
-
-  IMPORTANT:
-  For a real production KYC system, identity documents
-  should be stored privately and served only after admin
-  authentication.
-*/
 app.use(
   '/uploads',
   express.static(UPLOADS)
@@ -374,6 +366,10 @@ app.post('/api/auth/register', (req, res) => {
     const fullName = String(
       req.body.fullName || ''
     ).trim().slice(0, 100);
+
+    const telegramId = String(
+      req.body.telegramId || ''
+    ).trim().slice(0, 50);
 
     const password = String(
       req.body.password || ''
@@ -415,6 +411,7 @@ app.post('/api/auth/register', (req, res) => {
       userId: uid,
       username,
       fullName,
+      telegramId,
       passwordHash: passwordData.hash,
       passwordSalt: passwordData.salt,
       createdAt: new Date().toISOString()
@@ -467,7 +464,8 @@ app.post('/api/auth/login', (req, res) => {
       req.body.password || ''
     );
 
-    const user = read('users').find(
+    const users = read('users');
+    const user = users.find(
       u =>
         String(u.username).toLowerCase() ===
         username.toLowerCase()
@@ -485,6 +483,12 @@ app.post('/api/auth/login', (req, res) => {
       return res.status(401).json({
         error: 'Invalid username or password'
       });
+    }
+
+    // Optional dynamic update if telegramId passed during login
+    if (req.body.telegramId) {
+      user.telegramId = String(req.body.telegramId).trim().slice(0, 50);
+      write('users', users);
     }
 
     const token = crypto
@@ -539,12 +543,6 @@ app.post(
 /* =========================================================
    USER PROFILE
 ========================================================= */
-
-app.post('/api/users', (req, res) => {
-  res.status(410).json({
-    error: 'Use /api/auth/register'
-  });
-});
 
 app.get(
   '/api/me',
@@ -634,6 +632,10 @@ app.post(
         req.body.idNumber || ''
       ).trim();
 
+      const telegramId = String(
+        req.body.telegramId || ''
+      ).trim().slice(0, 50);
+
       if (
         !fullName ||
         !dob ||
@@ -674,9 +676,6 @@ app.post(
         });
       }
 
-      /*
-        Remove old uploaded documents.
-      */
       if (old) {
         for (const field of [
           'idDocument',
@@ -714,6 +713,7 @@ app.post(
         address,
         idType,
         idNumber,
+        telegramId,
 
         idDocument:
           '/uploads/' +
@@ -740,11 +740,7 @@ app.post(
 
       write('kyc', next);
 
-      /*
-        Update user's display name.
-      */
       const users = read('users');
-
       const user = users.find(
         u =>
           String(u.userId) ===
@@ -753,6 +749,9 @@ app.post(
 
       if (user) {
         user.fullName = fullName;
+        if (telegramId) {
+          user.telegramId = telegramId;
+        }
         write('users', users);
       }
 
@@ -775,15 +774,24 @@ app.get(
   '/api/admin/kyc',
   requireAdmin,
   (req, res) => {
-    const data = read('kyc')
-      .sort(
-        (a, b) =>
-          String(b.submittedAt).localeCompare(
-            String(a.submittedAt)
-          )
-      );
+    const kycList = read('kyc');
+    const users = read('users');
 
-    res.json(data);
+    const enriched = kycList.map(item => {
+      const user = users.find(u => String(u.userId) === String(item.userId)) || {};
+      return {
+        ...item,
+        username: user.username || '',
+        telegramId: item.telegramId || user.telegramId || ''
+      };
+    }).sort(
+      (a, b) =>
+        String(b.submittedAt).localeCompare(
+          String(a.submittedAt)
+        )
+    );
+
+    res.json(enriched);
   }
 );
 
@@ -3107,17 +3115,11 @@ function expireOrders() {
   }
 }
 
-/*
-  Check expired orders every 30 seconds.
-*/
 setInterval(
   expireOrders,
   30 * 1000
 );
 
-/*
-  Run once when server starts.
-*/
 expireOrders();
 
 /* =========================================================
@@ -3147,11 +3149,6 @@ app.get(
    SPA FALLBACK
 ========================================================= */
 
-/*
-  This intentionally uses app.use() instead of
-  app.get('*') so it works with both Express 4
-  and Express 5.
-*/
 app.use(
   (req, res, next) => {
     if (
