@@ -1,119 +1,133 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Once P2P Admin Dashboard</title>
-  <style>
-    body{margin:0;font-family:Arial,sans-serif;background:#f5f7fb;color:#172033}
-    header{background:#111827;color:#fff;padding:16px;text-align:center}
-    .container{max-width:1200px;margin:auto;padding:20px}
-    .card{background:#fff;border-radius:12px;padding:16px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
-    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
-    .menu{cursor:pointer;padding:16px;border-radius:10px;background:#eef2ff}
-    .menu:hover{background:#dbeafe}
-    .section{display:none}
-    input,select,textarea,button{width:100%;padding:10px;margin-top:8px;border-radius:8px;border:1px solid #d0d5dd;box-sizing:border-box}
-    button{background:#111827;color:#fff;border:none}
-    .green{background:#087443}
-    .red{background:#b42318}
-    .back{background:#475467;margin-bottom:10px}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Once P2P Admin Dashboard</title>
+<style>
+body{font-family:Arial;background:#f5f7fb;margin:0;color:#172033}
+header{background:#081225;color:white;padding:18px;text-align:center;font-size:24px;font-weight:bold}
+.container{padding:15px;max-width:1000px;margin:auto}
+.card{background:white;padding:15px;border-radius:12px;margin-bottom:15px;box-shadow:0 2px 10px #0001}
+.menu{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.menu button{padding:14px;background:#101828;color:white;border:none;border-radius:10px}
+.section{display:none}
+input,textarea,select,button{width:100%;padding:10px;margin-top:8px;border-radius:8px;border:1px solid #ccc;box-sizing:border-box}
+button{background:#101828;color:white;border:none}
+.green{background:#087443}
+.red{background:#b42318}
+.gray{background:#475467}
+img{width:100%;border-radius:10px;margin-top:10px}
+.badge{padding:5px 10px;border-radius:20px;background:#FFF4CC;color:#8A5A00;display:inline-block}
+</style>
 </head>
 <body>
-<header><h2>Once P2P Admin Dashboard</h2></header>
+<header>Once P2P Admin Dashboard</header>
 <div class="container">
 
-<div class="card" id="loginCard">
+<div id="loginCard" class="card">
 <h3>Admin Login</h3>
-<input type="password" id="adminKey" placeholder="Admin Key">
+<input type="password" id="adminKey" placeholder="Enter Admin Key">
 <button onclick="login()">Open Dashboard</button>
 </div>
 
-<div id="menu" style="display:none">
-<div class="grid">
-<div class="menu" onclick="openPage('kyc')"><b>KYC Verification</b><br>Approve / Reject IDs</div>
-<div class="menu" onclick="openPage('wallet')"><b>Wallet Requests</b><br>Deposits & Withdrawals</div>
-<div class="menu" onclick="openPage('orders')"><b>Orders & Disputes</b><br>Refund / Release</div>
-<div class="menu" onclick="openPage('help')"><b>Help Center</b><br>Support Tickets</div>
-<div class="menu" onclick="openPage('tier')"><b>Tier & Fee</b><br>Tier 0-3 Limits</div>
-<div class="menu" onclick="openPage('revenue')"><b>Platform Revenue</b><br>$0.38 Fee Dashboard</div>
-<div class="menu" onclick="openPage('users')"><b>User Management</b><br>Freeze / Unfreeze</div>
-<div class="menu" onclick="openPage('settings')"><b>System Settings</b><br>Maintenance & Rates</div>
+<div id="dashboard" style="display:none">
+<div class="menu">
+<button onclick="show('kyc')">KYC</button>
+<button onclick="show('wallet')">Wallet</button>
+<button onclick="show('orders')">Orders</button>
+<button onclick="show('help')">Help Center</button>
+<button onclick="show('tier')">Tier & Fee</button>
+<button onclick="show('revenue')">Revenue</button>
+<button onclick="show('users')">Users</button>
+<button onclick="show('settings')">Settings</button>
 </div>
 </div>
 
 <div id="kyc" class="section card">
-<button class="back" onclick="home()">← Back</button>
-<h3>KYC Verification</h3>
-<p>User: TG123456</p>
-<p>Status: Pending</p>
-<button class="green">Approve</button>
-<button class="red">Reject</button>
+<button class="gray" onclick="home()">← Back</button>
+<h2>KYC Verification</h2>
+<p><span class="badge">Pending</span></p>
+<b>Full Name</b>
+<p id="fullName">Loading...</p>
+<b>User ID</b>
+<p id="userId">Loading...</p>
+<b>Telegram ID</b>
+<p id="telegramId">Loading...</p>
+<b>ID Number</b>
+<p id="idNumber">Loading...</p>
+<b>ID Type</b>
+<p id="idType">National ID</p>
+<h3>ID Document</h3>
+<img id="idImage" src="/uploads/id-placeholder.png">
+<h3>Selfie</h3>
+<img id="selfieImage" src="/uploads/selfie-placeholder.png">
+<button class="green">Approve KYC</button>
+<button class="red">Reject KYC</button>
 <textarea placeholder="Rejection reason"></textarea>
 </div>
 
 <div id="wallet" class="section card">
-<button class="back" onclick="home()">← Back</button>
-<h3>Wallet Requests</h3>
-<p>Deposit #1042 - 2,500 ETB</p>
+<button class="gray" onclick="home()">← Back</button>
+<h2>Wallet Requests</h2>
+<p>Deposit Request — 2500 ETB</p>
 <button class="green">Approve Deposit</button>
 <button class="red">Reject Deposit</button>
 <hr>
-<p>Withdraw #2088 - 700 ETB</p>
+<p>Withdrawal Request — 700 ETB</p>
 <button class="green">Approve Withdrawal</button>
 <button class="red">Reject Withdrawal</button>
 </div>
 
 <div id="orders" class="section card">
-<button class="back" onclick="home()">← Back</button>
-<h3>Orders & Disputes</h3>
-<p>Order #50091 - 1,200 ETB</p>
+<button class="gray" onclick="home()">← Back</button>
+<h2>Orders & Disputes</h2>
+<p>Order #50091 — 1200 ETB</p>
 <button class="green">Release Seller</button>
 <button class="red">Refund Buyer</button>
 </div>
 
 <div id="help" class="section card">
-<button class="back" onclick="home()">← Back</button>
-<h3>Help Center</h3>
-<p>Ticket #3001</p>
-<textarea placeholder="Reply to user"></textarea>
+<button class="gray" onclick="home()">← Back</button>
+<h2>Help Center</h2>
+<p>User: TG123456</p>
+<textarea placeholder="Reply to support ticket"></textarea>
 <button class="green">Send Reply</button>
 <button>Close Ticket</button>
 </div>
 
 <div id="tier" class="section card">
-<button class="back" onclick="home()">← Back</button>
-<h3>Tier & Fee Manager</h3>
+<button class="gray" onclick="home()">← Back</button>
+<h2>Tier & Fee Manager</h2>
 <select>
 <option>Tier 0</option>
 <option>Tier 1</option>
 <option>Tier 2</option>
 <option>Tier 3</option>
 </select>
-<input placeholder="Daily Transfer Limit (ETB)">
-<input placeholder="Monthly Transfer Limit (ETB)">
-<input placeholder="Transfer Fee (ETB)">
-<input placeholder="Withdrawal Fee (ETB)">
+<input placeholder="Daily Transfer Limit ETB">
+<input placeholder="Monthly Transfer Limit ETB">
+<input placeholder="Transfer Fee ETB">
+<input placeholder="Withdrawal Fee ETB">
 <input value="0.38" placeholder="Platform Fee USD">
-<button class="green">Save Tier & Fees</button>
+<button class="green">Save Tier Settings</button>
 </div>
 
 <div id="revenue" class="section card">
-<button class="back" onclick="home()">← Back</button>
-<h3>Platform Revenue</h3>
-<p>Platform Fee Per Transaction: <b>$0.38</b></p>
-<p>Owner Wallet Balance: <b>$0.00</b></p>
-<p>Total Fees Collected: <b>$0.00</b></p>
-<p>Total Transactions: <b>0</b></p>
-<button>View Revenue History</button>
+<button class="gray" onclick="home()">← Back</button>
+<h2>Platform Revenue</h2>
+<p><b>Platform Fee:</b> $0.38</p>
+<p><b>Owner Wallet Balance:</b> $0.00</p>
+<p><b>Total Fees Collected:</b> $0.00</p>
+<p><b>Today's Revenue:</b> $0.00</p>
+<p><b>This Month:</b> $0.00</p>
 </div>
 
 <div id="users" class="section card">
-<button class="back" onclick="home()">← Back</button>
-<h3>User Management</h3>
+<button class="gray" onclick="home()">← Back</button>
+<h2>User Management</h2>
 <input placeholder="Search User ID or Telegram Username">
-<button>Search</button>
+<button>Search User</button>
 <button class="red">Freeze Wallet</button>
 <button class="green">Unfreeze Wallet</button>
 <button>Reset PIN</button>
@@ -121,40 +135,63 @@
 </div>
 
 <div id="settings" class="section card">
-<button class="back" onclick="home()">← Back</button>
-<h3>System Settings</h3>
+<button class="gray" onclick="home()">← Back</button>
+<h2>System Settings</h2>
 <label>Maintenance Mode</label>
 <select>
 <option>OFF</option>
 <option>ON</option>
 </select>
-<label>USD → ETB Exchange Rate</label>
-<input placeholder="Enter exchange rate">
-<label>Broadcast Announcement</label>
-<textarea placeholder="Message to all users"></textarea>
+<input placeholder="USD → ETB Exchange Rate">
+<textarea placeholder="Broadcast message to all users"></textarea>
 <button class="green">Send Announcement</button>
 </div>
 
 </div>
 
 <script>
-const ADMIN_KEY="ONCEP2P_ADMIN_V114";
-function login(){
- const key=document.getElementById('adminKey').value;
- if(key!==ADMIN_KEY){alert('Wrong admin key');return;}
- document.getElementById('loginCard').style.display='none';
- document.getElementById('menu').style.display='block';
-}
-function openPage(id){
- document.getElementById('menu').style.display='none';
- document.querySelectorAll('.section').forEach(s=>s.style.display='none');
- document.getElementById(id).style.display='block';
-}
-function home(){
- document.querySelectorAll('.section').forEach(s=>s.style.display='none');
- document.getElementById('menu').style.display='block';
-}
-</script>
+const ADMIN_KEY='ONCEP2P_ADMIN_V114';
 
+function login(){
+  if(document.getElementById('adminKey').value!==ADMIN_KEY){
+    alert('Wrong Admin Key');
+    return;
+  }
+  document.getElementById('loginCard').style.display='none';
+  document.getElementById('dashboard').style.display='block';
+}
+
+function show(id){
+  document.getElementById('dashboard').style.display='none';
+  document.querySelectorAll('.section').forEach(x=>x.style.display='none');
+  document.getElementById(id).style.display='block';
+}
+
+function home(){
+  document.querySelectorAll('.section').forEach(x=>x.style.display='none');
+  document.getElementById('dashboard').style.display='block';
+}
+
+async function loadKYC(){
+  try{
+    const res=await fetch('/api/admin/kyc');
+    const data=await res.json();
+    if(data.length){
+      const k=data[0];
+      fullName.innerText=k.fullName||'';
+      userId.innerText=k.userId||'';
+      telegramId.innerText=k.telegramId||'';
+      idNumber.innerText=k.idNumber||'';
+      idType.innerText=k.idType||'';
+      idImage.src=k.idDocument||'/uploads/id-placeholder.png';
+      selfieImage.src=k.selfie||'/uploads/selfie-placeholder.png';
+    }
+  }catch(e){
+    console.log(e);
+  }
+}
+
+loadKYC();
+</script>
 </body>
 </html>
