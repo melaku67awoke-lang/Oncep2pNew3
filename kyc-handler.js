@@ -30,13 +30,18 @@ module.exports = function(app) {
 
       user.fullName = req.body.fullName || req.body.name || 'Verified Applicant';
       user.kycStatus = 'pending';
+      user.status = 'pending';
+      user.idNumber = req.body.idNumber || '123456';
+      user.idType = req.body.idType || 'ID Card';
       
       if (req.files) {
         if (req.files['idDocument']) {
           user.idDocumentUrl = `/uploads/${req.files['idDocument'][0].filename}`;
+          user.idDocument = user.idDocumentUrl;
         }
         if (req.files['selfie']) {
           user.selfieUrl = `/uploads/${req.files['selfie'][0].filename}`;
+          user.selfie = user.selfieUrl;
         }
       }
 
@@ -46,57 +51,59 @@ module.exports = function(app) {
     }
   });
 
-  // Admin: Get ALL Users or Pending Submissions
+  // Admin: Get KYC Submissions
   app.get('/api/admin/kyc', (req, res) => {
     try {
       global.db = global.db || { users: [] };
-      // Fallback: if no pending users exist yet, show a mock card so you can test buttons immediately
-      let submissions = global.db.users.filter(u => u.kycStatus === 'pending' || u.kycStatus === 'submitted' || u.idDocumentUrl);
       
-      if (submissions.length === 0) {
-        submissions = [{
-          id: 'test_user_1',
-          fullName: 'Sample User',
-          kycStatus: 'pending',
-          idDocumentUrl: 'https://via.placeholder.com/140x90?text=ID+Card',
-          selfieUrl: 'https://via.placeholder.com/140x90?text=Selfie',
-          tier: 1,
-          feeRate: '1%',
-          escrowEnabled: false
-        }];
-      }
+      // Map users to match admin.html expectations cleanly
+      const submissions = global.db.users.map(u => ({
+        id: u.id || '1',
+        userId: u.id || '1',
+        fullName: u.fullName || 'Test Applicant',
+        status: u.kycStatus || u.status || 'pending',
+        telegramId: u.telegramId || 'N/A',
+        idNumber: u.idNumber || '123456',
+        idType: u.idType || 'ID Card',
+        idDocument: u.idDocumentUrl || u.idDocument || '/uploads/id-placeholder.png',
+        selfie: u.selfieUrl || u.selfie || '/uploads/selfie-placeholder.png',
+        reason: u.reason || ''
+      }));
 
-      res.json({ success: true, submissions });
+      res.json(submissions);
     } catch (err) {
-      res.status(500).json({ success: false, error: err.message });
+      res.status(500).json({ error: err.message });
     }
   });
 
-  // Admin: Approve or Reject KYC (Updates Wallet, Escrow, Tier, and Fee)
-  app.post('/api/admin/kyc/:userId/:action', (req, res) => {
-    const { userId, action } = req.params;
+  // Admin: Review KYC (Approve / Reject) matching admin.html endpoint
+  app.post('/api/admin/kyc/:id/review', (req, res) => {
+    const { id } = req.params;
+    const { status, reason } = req.body;
+    
     try {
       global.db = global.db || { users: [] };
-      let user = global.db.users.find(u => u.id == userId);
+      let user = global.db.users.find(u => u.id == id || u.userId == id);
       
       if (!user) {
-        user = global.db.users[0] || { id: userId };
-        if (!global.db.users.includes(user)) global.db.users.push(user);
+        user = { id, userId: id };
+        global.db.users.push(user);
       }
 
-      if (action === 'approve') {
-        user.kycStatus = 'approved';
+      user.kycStatus = status;
+      user.status = status;
+      user.reason = reason || '';
+
+      if (status === 'approved') {
         user.tier = 2;
         user.escrowEnabled = true;
         user.feeRate = '0.5%';
         user.walletStatus = 'verified';
-      } else if (action === 'reject') {
-        user.kycStatus = 'rejected';
       }
 
       res.json({ success: true, user });
     } catch (err) {
-      res.status(500).json({ success: false, error: err.message });
+      res.status(500).json({ error: err.message });
     }
   });
 };
