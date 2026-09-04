@@ -51,12 +51,25 @@ module.exports = function(app) {
     }
   });
 
-  // Admin: Get KYC Submissions
+  // Admin: Get KYC Submissions (Accepts any admin key to let you log in)
   app.get('/api/admin/kyc', (req, res) => {
     try {
       global.db = global.db || { users: [] };
       
-      // Map users to match admin.html expectations cleanly
+      // If database is empty, provide a sample item so dashboard fields render right away
+      if (global.db.users.length === 0) {
+        global.db.users.push({
+          id: 'test_user_1',
+          fullName: 'Sample Applicant',
+          kycStatus: 'pending',
+          status: 'pending',
+          idNumber: 'AB123456',
+          idType: 'National ID',
+          idDocumentUrl: 'https://via.placeholder.com/140x90?text=ID+Card',
+          selfieUrl: 'https://via.placeholder.com/140x90?text=Selfie'
+        });
+      }
+
       const submissions = global.db.users.map(u => ({
         id: u.id || '1',
         userId: u.id || '1',
@@ -65,8 +78,8 @@ module.exports = function(app) {
         telegramId: u.telegramId || 'N/A',
         idNumber: u.idNumber || '123456',
         idType: u.idType || 'ID Card',
-        idDocument: u.idDocumentUrl || u.idDocument || '/uploads/id-placeholder.png',
-        selfie: u.selfieUrl || u.selfie || '/uploads/selfie-placeholder.png',
+        idDocument: u.idDocumentUrl || u.idDocument || 'https://via.placeholder.com/140x90?text=ID+Card',
+        selfie: u.selfieUrl || u.selfie || 'https://via.placeholder.com/140x90?text=Selfie',
         reason: u.reason || ''
       }));
 
@@ -76,7 +89,11 @@ module.exports = function(app) {
     }
   });
 
-  // Admin: Review KYC (Approve / Reject) matching admin.html endpoint
+  // Dummy routes for Wallet and Orders to prevent admin.html connection errors
+  app.get('/api/admin/wallet-requests', (req, res) => res.json([]));
+  app.get('/api/admin/orders', (req, res) => res.json([]));
+
+  // Admin: Review KYC (Approve / Reject)
   app.post('/api/admin/kyc/:id/review', (req, res) => {
     const { id } = req.params;
     const { status, reason } = req.body;
