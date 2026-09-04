@@ -1415,15 +1415,29 @@
             });
         }
 
+        function openCreateTicketModal() {
+            document.getElementById('ticketSubject').value = '';
+            document.getElementById('ticketMessage').value = '';
+            document.getElementById('subjectCount').innerText = '0/200 characters';
+            document.getElementById('messageCount').innerText = '0/5000 characters';
+            document.getElementById('attachmentLabel').innerText = 'Upload file (Screenshot/Receipt)';
+            validateTicketForm();
+            document.getElementById('createTicketModal').classList.remove('hidden');
+        }
+
+        function closeCreateTicketModal() {
+            document.getElementById('createTicketModal').classList.add('hidden');
+        }
+
         function validateTicketForm() {
-            const subject = document.getElementById('ticketSubject').value;
-            const message = document.getElementById('ticketMessage').value;
+            const subject = document.getElementById('ticketSubject').value.trim();
+            const message = document.getElementById('ticketMessage').value.trim();
             const submitBtn = document.getElementById('submitTicketBtn');
-            
+
             document.getElementById('subjectCount').innerText = `${subject.length}/200 characters`;
             document.getElementById('messageCount').innerText = `${message.length}/5000 characters`;
 
-            if (subject.trim().length > 0 && message.trim().length > 0) {
+            if (subject.length > 0 && message.length > 0) {
                 submitBtn.disabled = false;
                 submitBtn.className = "py-2.5 rounded-xl bg-amber-400 hover:bg-amber-500 text-slate-950 font-bold text-xs cursor-pointer transition-all";
             } else {
@@ -1432,18 +1446,23 @@
             }
         }
 
+        function handleFileSelect(input) {
+            if (input.files && input.files[0]) {
+                document.getElementById('attachmentLabel').innerText = input.files[0].name;
+            }
+        }
+
         function submitNewTicket() {
             const category = document.getElementById('ticketCategory').value;
-            const subject = document.getElementById('ticketSubject').value;
-            const message = document.getElementById('ticketMessage').value;
-
-            if (!subject.trim() || !message.trim()) return;
+            const subject = document.getElementById('ticketSubject').value.trim();
+            const message = document.getElementById('ticketMessage').value.trim();
 
             const now = new Date();
             const dateStr = (now.getMonth() + 1) + '/' + now.getDate() + '/' + now.getFullYear() + ', ' + now.toLocaleTimeString();
+            const randId = Math.floor(1000 + Math.random() * 9000);
 
             supportTickets.unshift({
-                id: Math.floor(100000 + Math.random() * 900000),
+                id: randId,
                 category,
                 subject,
                 message,
@@ -1455,23 +1474,10 @@
             renderSupportTickets();
         }
 
-        function openCreateTicketModal() {
-            document.getElementById('ticketSubject').value = '';
-            document.getElementById('ticketMessage').value = '';
-            document.getElementById('attachmentLabel').innerText = 'Upload file (Screenshot/Receipt)';
-            validateTicketForm();
-            document.getElementById('createTicketModal').classList.remove('hidden');
-        }
-
-        function closeCreateTicketModal() {
-            document.getElementById('createTicketModal').classList.add('hidden');
-        }
-
         function openAddPaymentModal() {
             document.getElementById('accountNumberInput').value = '';
             document.getElementById('phoneInput').value = '';
-            document.getElementById('savePaymentBtn').disabled = true;
-            document.getElementById('savePaymentBtn').className = "py-2.5 rounded-xl bg-slate-800 text-slate-500 font-bold text-xs cursor-not-allowed";
+            validateAddForm();
             document.getElementById('addPaymentModal').classList.remove('hidden');
         }
 
@@ -1480,34 +1486,38 @@
         }
 
         function validateAddForm() {
-            const accNum = document.getElementById('accountNumberInput').value;
-            const phone = document.getElementById('phoneInput').value;
-            const btn = document.getElementById('savePaymentBtn');
+            const accNum = document.getElementById('accountNumberInput').value.trim();
+            const phone = document.getElementById('phoneInput').value.trim();
+            const saveBtn = document.getElementById('savePaymentBtn');
 
-            if (accNum.trim().length > 3 && phone.trim().length >= 9) {
-                btn.disabled = false;
-                btn.className = "py-2.5 rounded-xl bg-amber-400 hover:bg-amber-500 text-slate-950 font-bold text-xs cursor-pointer";
+            if (accNum.length > 0 && phone.length >= 9) {
+                saveBtn.disabled = false;
+                saveBtn.className = "py-2.5 rounded-xl bg-amber-400 hover:bg-amber-500 text-slate-950 font-bold text-xs cursor-pointer transition-all";
             } else {
-                btn.disabled = true;
-                btn.className = "py-2.5 rounded-xl bg-slate-800 text-slate-500 font-bold text-xs cursor-not-allowed";
+                saveBtn.disabled = true;
+                saveBtn.className = "py-2.5 rounded-xl bg-slate-800 text-slate-500 font-bold text-xs cursor-not-allowed";
             }
         }
 
         function saveNewPaymentMethod() {
-            const type = document.getElementById('paymentProviderSelect').value;
-            const accountNumber = document.getElementById('accountNumberInput').value;
-            const phoneNumber = document.getElementById('phoneInput').value;
+            const provider = document.getElementById('paymentProviderSelect').value;
+            const name = document.getElementById('accountNameInput').value;
+            const accountNumber = document.getElementById('accountNumberInput').value.trim();
+            const phoneNumber = document.getElementById('phoneInput').value.trim();
 
             paymentAccounts.push({
                 id: Date.now(),
-                type,
-                name: 'Melaku Awoke',
-                accountNumber,
-                phoneNumber
+                type: provider,
+                name: name,
+                accountNumber: accountNumber,
+                phoneNumber: phoneNumber
             });
 
             closeAddPaymentModal();
             renderPaymentAccounts();
+            if (document.getElementById('selectedPaymentMethodDisplay')) {
+                document.getElementById('selectedPaymentMethodText').innerText = `${provider} - ${accountNumber}`;
+            }
         }
 
         function openDeleteModal(id) {
@@ -1524,84 +1534,8 @@
             if (accountToDeleteId !== null) {
                 paymentAccounts = paymentAccounts.filter(acc => acc.id !== accountToDeleteId);
                 renderPaymentAccounts();
+                closeDeleteModal();
             }
-            closeDeleteModal();
-        }
-
-        function openDepositModal() {
-            document.getElementById('depositModal').classList.remove('hidden');
-        }
-
-        function closeDepositModal() {
-            document.getElementById('depositModal').classList.add('hidden');
-        }
-
-        function copyAddress() {
-            const addressText = document.getElementById('wallet-address').innerText;
-            navigator.clipboard.writeText(addressText);
-            const copyText = document.getElementById('copy-text');
-            copyText.innerText = 'Copied!';
-            setTimeout(() => { copyText.innerText = 'Copy'; }, 2000);
-        }
-
-        function openWithdrawModal() {
-            document.getElementById('withdrawAmountInput').value = '';
-            document.getElementById('withdrawAddressInput').value = '';
-            document.getElementById('withdrawWarning').classList.add('hidden');
-            document.getElementById('previewWithdrawBtn').disabled = true;
-            document.getElementById('previewWithdrawBtn').className = "w-full py-3 rounded-xl bg-slate-800 text-slate-500 font-bold text-xs transition-all cursor-not-allowed mt-1";
-            document.getElementById('withdrawModal').classList.remove('hidden');
-        }
-
-        function closeWithdrawModal() {
-            document.getElementById('withdrawModal').classList.add('hidden');
-        }
-
-        function handleWithdrawInput() {
-            const val = parseFloat(document.getElementById('withdrawAmountInput').value) || 0;
-            const warningEl = document.getElementById('withdrawWarning');
-            const previewBtn = document.getElementById('previewWithdrawBtn');
-            const addressVal = document.getElementById('withdrawAddressInput').value;
-
-            if (val > userWalletBalance) {
-                warningEl.classList.remove('hidden');
-                previewBtn.disabled = true;
-                previewBtn.className = "w-full py-3 rounded-xl bg-slate-800 text-slate-500 font-bold text-xs transition-all cursor-not-allowed mt-1";
-                return;
-            } else {
-                warningEl.classList.add('hidden');
-            }
-
-            if (val > 0 && addressVal.trim().length > 5) {
-                previewBtn.disabled = false;
-                previewBtn.className = "w-full py-3 rounded-xl bg-amber-400 hover:bg-amber-500 text-slate-950 font-bold text-xs transition-all cursor-pointer mt-1";
-            } else {
-                previewBtn.disabled = true;
-                previewBtn.className = "w-full py-3 rounded-xl bg-slate-800 text-slate-500 font-bold text-xs transition-all cursor-not-allowed mt-1";
-            }
-        }
-
-        function validateWithdrawForm() {
-            handleWithdrawInput();
-        }
-
-        function setMaxWithdraw() {
-            document.getElementById('withdrawAmountInput').value = userWalletBalance;
-            handleWithdrawInput();
-        }
-
-        function submitWithdrawal() {
-            alert('Withdrawal request submitted successfully.');
-            closeWithdrawModal();
-        }
-
-        function pasteWithdrawAddress() {
-            navigator.clipboard.readText().then(text => {
-                document.getElementById('withdrawAddressInput').value = text;
-                handleWithdrawInput();
-            }).catch(() => {
-                alert('Please paste address manually.');
-            });
         }
 
         function openCreateAdModal() {
@@ -1619,9 +1553,9 @@
 
             myAds.push({
                 id: Date.now(),
-                type,
-                price,
-                amount,
+                type: type,
+                price: price,
+                amount: amount,
                 status: 'Active'
             });
 
@@ -1635,20 +1569,29 @@
             container.innerHTML = '';
 
             if (myAds.length === 0) {
-                container.innerHTML = `<div class="bg-cardbg p-8 rounded-2xl border border-slate-800 text-center text-xs text-slate-400">You have no active ads posted.</div>`;
+                container.innerHTML = `<div class="bg-cardbg p-8 rounded-2xl border border-slate-800 text-center text-xs text-slate-400">You have no active or paused ads. Post a new ad to start trading.</div>`;
                 return;
             }
 
             myAds.forEach(ad => {
                 container.innerHTML += `
-                    <div class="bg-cardbg p-4 rounded-2xl border border-slate-800 space-y-2 text-xs shadow-md">
+                    <div class="bg-cardbg p-4 rounded-2xl border border-slate-800 space-y-3 text-xs shadow-md">
                         <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                            <span class="px-2.5 py-1 rounded-lg font-bold uppercase text-[10px] ${ad.type === 'buy' ? 'bg-emerald-500/10 text-primary' : 'bg-rose-500/10 text-rose-400'}">${ad.type} USDT</span>
+                            <span class="px-2.5 py-1 rounded-lg font-bold text-primary bg-emerald-500/10 uppercase text-[10px]">${ad.type} USDT</span>
                             <button onclick="openDeleteAdModal(${ad.id})" class="text-slate-400 hover:text-rose-400 cursor-pointer">Delete</button>
                         </div>
-                        <div class="grid grid-cols-2 gap-2 pt-1">
-                            <div><span class="text-slate-500 text-[10px] uppercase">Price</span><span class="text-white font-bold">${ad.price.toFixed(2)} ETB</span></div>
-                            <div><span class="text-slate-500 text-[10px] uppercase">Amount</span><span class="text-white font-bold">${ad.amount} USDT</span></div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <span class="text-slate-500 text-[10px] uppercase block">Price</span>
+                                <span class="text-white font-bold text-sm">${ad.price.toFixed(2)} ETB</span>
+                            </div>
+                            <div>
+                                <span class="text-slate-500 text-[10px] uppercase block">Amount</span>
+                                <span class="text-white font-bold text-sm">${ad.amount} USDT</span>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center pt-1 text-[11px] text-slate-400">
+                            <span>Status: <span class="text-emerald-400 font-bold">${ad.status}</span></span>
                         </div>
                     </div>`;
             });
@@ -1668,28 +1611,112 @@
             if (adToDeleteId !== null) {
                 myAds = myAds.filter(ad => ad.id !== adToDeleteId);
                 renderMyAds();
+                closeDeleteAdModal();
             }
-            closeDeleteAdModal();
+        }
+
+        function openDepositModal() {
+            document.getElementById('depositModal').classList.remove('hidden');
+        }
+
+        function closeDepositModal() {
+            document.getElementById('depositModal').classList.add('hidden');
+        }
+
+        function copyAddress() {
+            const addr = document.getElementById('wallet-address').innerText;
+            navigator.clipboard.writeText(addr);
+            const copyText = document.getElementById('copy-text');
+            copyText.innerText = 'Copied!';
+            setTimeout(() => { copyText.innerText = 'Copy'; }, 2000);
+        }
+
+        function openWithdrawModal() {
+            document.getElementById('withdrawAmountInput').value = '';
+            document.getElementById('withdrawAddressInput').value = '';
+            document.getElementById('withdrawAvailableBalance').innerText = userWalletBalance.toFixed(2);
+            document.getElementById('withdrawWarning').classList.add('hidden');
+            validateWithdrawForm();
+            document.getElementById('withdrawModal').classList.remove('hidden');
+        }
+
+        function closeWithdrawModal() {
+            document.getElementById('withdrawModal').classList.add('hidden');
+        }
+
+        function handleWithdrawInput() {
+            const val = parseFloat(document.getElementById('withdrawAmountInput').value) || 0;
+            const warning = document.getElementById('withdrawWarning');
+            if (val > userWalletBalance) {
+                warning.classList.remove('hidden');
+            } else {
+                warning.classList.add('hidden');
+            }
+            validateWithdrawForm();
+        }
+
+        function setMaxWithdraw() {
+            document.getElementById('withdrawAmountInput').value = userWalletBalance;
+            handleWithdrawInput();
+        }
+
+        function pasteWithdrawAddress() {
+            navigator.clipboard.readText().then(text => {
+                document.getElementById('withdrawAddressInput').value = text;
+                validateWithdrawForm();
+            }).catch(() => {
+                // fallback if clipboard API not available
+            });
+        }
+
+        function validateWithdrawForm() {
+            const amount = parseFloat(document.getElementById('withdrawAmountInput').value) || 0;
+            const address = document.getElementById('withdrawAddressInput').value.trim();
+            const btn = document.getElementById('previewWithdrawBtn');
+
+            if (amount > 0 && amount <= userWalletBalance && address.startsWith('0x') && address.length > 10) {
+                btn.disabled = false;
+                btn.className = "w-full py-3 rounded-xl bg-primary hover:bg-emerald-600 text-slate-950 font-bold text-xs transition-all cursor-pointer mt-1";
+            } else {
+                btn.disabled = true;
+                btn.className = "w-full py-3 rounded-xl bg-slate-800 text-slate-500 font-bold text-xs transition-all cursor-not-allowed mt-1";
+            }
+        }
+
+        function submitWithdrawal() {
+            alert('Withdrawal request submitted successfully!');
+            closeWithdrawModal();
         }
 
         function sendChatMessage() {
             const input = document.getElementById('chatInput');
-            const chatMessages = document.getElementById('chatMessages');
-            if (!input.value.trim()) return;
+            const msg = input.value.trim();
+            if (!msg) return;
 
+            const chatMessages = document.getElementById('chatMessages');
             chatMessages.innerHTML += `
-                <div class="bg-slate-800 p-2 rounded-lg max-w-[80%] ml-auto text-slate-200">
+                <div class="bg-slate-800 p-2 rounded-lg max-w-[80%] text-slate-200 ml-auto">
                     <span class="font-bold text-amber-400 block text-[10px]">You</span>
-                    ${input.value}
+                    ${msg}
                 </div>`;
             input.value = '';
             chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            setTimeout(() => {
+                chatMessages.innerHTML += `
+                    <div class="bg-slate-800 p-2 rounded-lg max-w-[80%] text-slate-200">
+                        <span class="font-bold text-primary block text-[10px]">Merchant</span>
+                        Received your message. Processing order confirmation now.
+                    </div>`;
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, 1000);
         }
 
-        // Initialize background tasks
-        window.addEventListener('load', () => {
+        // Initialize timers on load
+        window.onload = function() {
             startOrderTimers();
-        });
+            renderMarketplace();
+        };
     </script>
 </body>
 </html>
