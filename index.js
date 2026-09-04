@@ -3265,3 +3265,4 @@ app.listen(
     }
   }
 );
+require('./kyc-handler')(app);
