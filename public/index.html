@@ -84,7 +84,7 @@
         </footer>
     </div>
 
-    <!-- VIEW 2: REGISTRATION STEP 1[cite: 7] -->
+    <!-- VIEW 2: REGISTRATION STEP 1 -->
     <div id="view-reg1" class="view-container hidden flex-col min-h-screen justify-between">
         <header class="border-b border-slate-800 bg-slate-900/60 backdrop-blur-md sticky top-0 z-50">
             <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -99,7 +99,7 @@
         <main class="flex-grow max-w-lg mx-auto px-6 py-10 w-full flex flex-col justify-center">
             <div class="bg-cardbg p-8 rounded-2xl border border-slate-800 shadow-xl">
                 <h2 class="text-2xl font-black text-white mb-2">Create Your Account</h2>
-                <p class="text-sm text-slate-400 mb-6">Enter your details accurately. Your legal full name must match your ID documents[cite: 7].</p>
+                <p class="text-sm text-slate-400 mb-6">Enter your details accurately. Your legal full name must match your ID documents.</p>
 
                 <form class="space-y-4" onsubmit="event.preventDefault(); switchView('view-reg2');">
                     <div>
@@ -109,7 +109,7 @@
                     <div>
                         <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Legal Full Name (Matching ID)</label>
                         <input type="text" required placeholder="e.g. Abebe Kebede" class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-primary transition-colors text-sm">
-                        <span class="text-[10px] text-amber-400 mt-1 block">⚠️ Cannot be changed after submission[cite: 7].</span>
+                        <span class="text-[10px] text-amber-400 mt-1 block">⚠️ Cannot be changed after submission.</span>
                     </div>
                     <div>
                         <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Email Address</label>
@@ -120,7 +120,7 @@
                         <input type="tel" required placeholder="+251 9XXXXXXXX" class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-primary transition-colors text-sm">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Pre-March 2025 Verified Binance ID[cite: 7]</label>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Pre-March 2025 Verified Binance ID</label>
                         <input type="text" required placeholder="Enter your Binance UID" class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-primary transition-colors text-sm">
                     </div>
                     <button type="submit" class="w-full py-4 mt-2 rounded-xl bg-primary hover:bg-emerald-600 text-slate-950 font-bold text-base transition-all shadow-lg shadow-emerald-500/20 flex items-center justify-center space-x-2 cursor-pointer">
@@ -138,7 +138,7 @@
         </footer>
     </div>
 
-    <!-- VIEW 3: REGISTRATION STEP 2[cite: 6] -->
+    <!-- VIEW 3: REGISTRATION STEP 2 -->
     <div id="view-reg2" class="view-container hidden flex-col min-h-screen justify-between">
         <header class="border-b border-slate-800 bg-slate-900/60 backdrop-blur-md sticky top-0 z-50">
             <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -146,14 +146,14 @@
                     <div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center font-bold text-slate-900 text-lg">P</div>
                     <span class="text-xl font-extrabold tracking-wide text-white">Once <span class="text-primary">P2P</span></span>
                 </div>
-                <div class="text-xs text-slate-400">Step <span class="text-primary font-bold">2</span> of 2[cite: 6]</div>
+                <div class="text-xs text-slate-400">Step <span class="text-primary font-bold">2</span> of 2</div>
             </div>
         </header>
 
         <main class="flex-grow max-w-lg mx-auto px-6 py-10 w-full flex flex-col justify-center">
             <div class="bg-cardbg p-8 rounded-2xl border border-slate-800 shadow-xl">
                 <h2 class="text-2xl font-black text-white mb-2">Verify Your Identity</h2>
-                <p class="text-sm text-slate-400 mb-6">Upload clear photos of the front and back of your official National ID or Passport[cite: 6].</p>
+                <p class="text-sm text-slate-400 mb-6">Upload clear photos of the front and back of your official National ID or Passport.</p>
 
                 <form class="space-y-6" onsubmit="event.preventDefault(); submitKYCApplication();">
                     <div>
@@ -227,7 +227,7 @@
         </footer>
     </div>
 
-    <!-- VIEW 5: MAIN APP (Marketplace, Wallet, Orders, Ads, Support)[cite: 8] -->
+    <!-- VIEW 5: MAIN APP (Marketplace, Wallet, Orders, Ads, Support) -->
     <div id="view-mainapp" class="view-container hidden flex-col min-h-screen justify-between pb-24 relative">
         <header id="mainHeader" class="border-b border-slate-800 bg-slate-900/60 backdrop-blur-md sticky top-0 z-40">
             <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -832,7 +832,7 @@
 
         function submitKYCApplication() {
             const form = document.querySelector('#view-reg2 form');
-            const files = form ? form.querySelectorAll('input[type=\"file\"]') : [];
+            const files = form ? form.querySelectorAll('input[type="file"]') : [];
             if (files.length < 2 || !files[0].files.length || !files[1].files.length) {
                 alert('Please upload both the front and back of your ID or Passport.');
                 return;
@@ -1415,29 +1415,15 @@
             });
         }
 
-        function openCreateTicketModal() {
-            document.getElementById('ticketSubject').value = '';
-            document.getElementById('ticketMessage').value = '';
-            document.getElementById('subjectCount').innerText = '0/200 characters';
-            document.getElementById('messageCount').innerText = '0/5000 characters';
-            document.getElementById('attachmentLabel').innerText = 'Upload file (Screenshot/Receipt)';
-            validateTicketForm();
-            document.getElementById('createTicketModal').classList.remove('hidden');
-        }
-
-        function closeCreateTicketModal() {
-            document.getElementById('createTicketModal').classList.add('hidden');
-        }
-
         function validateTicketForm() {
-            const subject = document.getElementById('ticketSubject').value.trim();
-            const message = document.getElementById('ticketMessage').value.trim();
+            const subject = document.getElementById('ticketSubject').value;
+            const message = document.getElementById('ticketMessage').value;
             const submitBtn = document.getElementById('submitTicketBtn');
-
+            
             document.getElementById('subjectCount').innerText = `${subject.length}/200 characters`;
             document.getElementById('messageCount').innerText = `${message.length}/5000 characters`;
 
-            if (subject.length > 0 && message.length > 0) {
+            if (subject.trim().length > 0 && message.trim().length > 0) {
                 submitBtn.disabled = false;
                 submitBtn.className = "py-2.5 rounded-xl bg-amber-400 hover:bg-amber-500 text-slate-950 font-bold text-xs cursor-pointer transition-all";
             } else {
@@ -1446,16 +1432,12 @@
             }
         }
 
-        function handleFileSelect(input) {
-            if (input.files && input.files[0]) {
-                document.getElementById('attachmentLabel').innerText = input.files[0].name;
-            }
-        }
-
         function submitNewTicket() {
             const category = document.getElementById('ticketCategory').value;
-            const subject = document.getElementById('ticketSubject').value.trim();
-            const message = document.getElementById('ticketMessage').value.trim();
+            const subject = document.getElementById('ticketSubject').value;
+            const message = document.getElementById('ticketMessage').value;
+
+            if (!subject.trim() || !message.trim()) return;
 
             const now = new Date();
             const dateStr = (now.getMonth() + 1) + '/' + now.getDate() + '/' + now.getFullYear() + ', ' + now.toLocaleTimeString();
@@ -1471,95 +1453,104 @@
 
             closeCreateTicketModal();
             renderSupportTickets();
-            alert('Support ticket submitted successfully!');
+        }
+
+        function openCreateTicketModal() {
+            document.getElementById('ticketSubject').value = '';
+            document.getElementById('ticketMessage').value = '';
+            document.getElementById('attachmentLabel').innerText = 'Upload file (Screenshot/Receipt)';
+            validateTicketForm();
+            document.getElementById('createTicketModal').classList.remove('hidden');
+        }
+
+        function closeCreateTicketModal() {
+            document.getElementById('createTicketModal').classList.add('hidden');
+        }
+
+        function openAddPaymentModal() {
+            document.getElementById('accountNumberInput').value = '';
+            document.getElementById('phoneInput').value = '';
+            document.getElementById('savePaymentBtn').disabled = true;
+            document.getElementById('savePaymentBtn').className = "py-2.5 rounded-xl bg-slate-800 text-slate-500 font-bold text-xs cursor-not-allowed";
+            document.getElementById('addPaymentModal').classList.remove('hidden');
+        }
+
+        function closeAddPaymentModal() {
+            document.getElementById('addPaymentModal').classList.add('hidden');
         }
 
         function validateAddForm() {
-            const accNum = document.getElementById('accountNumberInput').value.trim();
-            const phone = document.getElementById('phoneInput').value.trim();
-            const saveBtn = document.getElementById('savePaymentBtn');
-            if (accNum.length > 0 && phone.length === 10) {
-                saveBtn.disabled = false;
-                saveBtn.className = "py-2.5 rounded-xl bg-amber-400 text-slate-950 font-bold text-xs cursor-pointer";
+            const accNum = document.getElementById('accountNumberInput').value;
+            const phone = document.getElementById('phoneInput').value;
+            const btn = document.getElementById('savePaymentBtn');
+
+            if (accNum.trim().length > 3 && phone.trim().length >= 9) {
+                btn.disabled = false;
+                btn.className = "py-2.5 rounded-xl bg-amber-400 hover:bg-amber-500 text-slate-950 font-bold text-xs cursor-pointer";
             } else {
-                saveBtn.disabled = true;
-                saveBtn.className = "py-2.5 rounded-xl bg-slate-800 text-slate-500 font-bold text-xs cursor-not-allowed";
+                btn.disabled = true;
+                btn.className = "py-2.5 rounded-xl bg-slate-800 text-slate-500 font-bold text-xs cursor-not-allowed";
             }
         }
 
-        function openAddPaymentModal() { document.getElementById('addPaymentModal').classList.remove('hidden'); }
-        function closeAddPaymentModal() { document.getElementById('addPaymentModal').classList.add('hidden'); }
         function saveNewPaymentMethod() {
-            const provider = document.getElementById('paymentProviderSelect').value;
-            const accountNumber = document.getElementById('accountNumberInput').value.trim();
-            const phoneNumber = document.getElementById('phoneInput').value.trim();
-            paymentAccounts.push({ id: Date.now(), type: provider, name: 'Melaku Awoke', accountNumber, phoneNumber });
+            const type = document.getElementById('paymentProviderSelect').value;
+            const accountNumber = document.getElementById('accountNumberInput').value;
+            const phoneNumber = document.getElementById('phoneInput').value;
+
+            paymentAccounts.push({
+                id: Date.now(),
+                type,
+                name: 'Melaku Awoke',
+                accountNumber,
+                phoneNumber
+            });
+
             closeAddPaymentModal();
             renderPaymentAccounts();
         }
-        function openDeleteModal(id) { accountToDeleteId = id; document.getElementById('deleteModal').classList.remove('hidden'); }
-        function closeDeleteModal() { accountToDeleteId = null; document.getElementById('deleteModal').classList.add('hidden'); }
+
+        function openDeleteModal(id) {
+            accountToDeleteId = id;
+            document.getElementById('deleteModal').classList.remove('hidden');
+        }
+
+        function closeDeleteModal() {
+            accountToDeleteId = null;
+            document.getElementById('deleteModal').classList.add('hidden');
+        }
+
         function confirmDeleteAccount() {
-            paymentAccounts = paymentAccounts.filter(acc => acc.id !== accountToDeleteId);
+            if (accountToDeleteId !== null) {
+                paymentAccounts = paymentAccounts.filter(acc => acc.id !== accountToDeleteId);
+                renderPaymentAccounts();
+            }
             closeDeleteModal();
-            renderPaymentAccounts();
         }
 
-        function openDepositModal() { document.getElementById('depositModal').classList.remove('hidden'); }
-        function closeDepositModal() { document.getElementById('depositModal').classList.add('hidden'); }
-        
+        function openDepositModal() {
+            document.getElementById('depositModal').classList.remove('hidden');
+        }
+
+        function closeDepositModal() {
+            document.getElementById('depositModal').classList.add('hidden');
+        }
+
         function copyAddress() {
-            const address = "0x8e54105bed3243e1ca44a0cccc6b62cf2bff9df4";
-            const copyText = document.getElementById("copy-text");
-
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(address).then(() => {
-                    showCopiedFeedback(copyText);
-                }).catch(() => {
-                    fallbackCopyText(address, copyText);
-                });
-            } else {
-                fallbackCopyText(address, copyText);
-            }
-        }
-
-        function fallbackCopyText(text, copyTextElement) {
-            const textArea = document.createElement("textarea");
-            textArea.value = text;
-            textArea.style.position = "fixed";
-            textArea.style.top = "0";
-            textArea.style.left = "0";
-            textArea.style.opacity = "0";
-            document.body.appendChild(textArea);
-            textArea.focus();
-            textArea.select();
-            try {
-                const successful = document.execCommand('copy');
-                if (successful) {
-                    showCopiedFeedback(copyTextElement);
-                } else {
-                    alert("Failed to copy address.");
-                }
-            } catch (err) {
-                alert("Copying not supported on this browser context.");
-            }
-            document.body.removeChild(textArea);
-        }
-
-        function showCopiedFeedback(copyTextElement) {
-            copyTextElement.textContent = "Copied!";
-            setTimeout(() => {
-                copyTextElement.textContent = "Copy";
-            }, 2000);
+            const addressText = document.getElementById('wallet-address').innerText;
+            navigator.clipboard.writeText(addressText);
+            const copyText = document.getElementById('copy-text');
+            copyText.innerText = 'Copied!';
+            setTimeout(() => { copyText.innerText = 'Copy'; }, 2000);
         }
 
         function openWithdrawModal() {
-            document.getElementById('withdrawModal').classList.remove('hidden');
-            document.getElementById('withdrawAvailableBalance').innerText = userWalletBalance.toFixed(2);
             document.getElementById('withdrawAmountInput').value = '';
             document.getElementById('withdrawAddressInput').value = '';
             document.getElementById('withdrawWarning').classList.add('hidden');
-            validateWithdrawForm();
+            document.getElementById('previewWithdrawBtn').disabled = true;
+            document.getElementById('previewWithdrawBtn').className = "w-full py-3 rounded-xl bg-slate-800 text-slate-500 font-bold text-xs transition-all cursor-not-allowed mt-1";
+            document.getElementById('withdrawModal').classList.remove('hidden');
         }
 
         function closeWithdrawModal() {
@@ -1569,50 +1560,48 @@
         function handleWithdrawInput() {
             const val = parseFloat(document.getElementById('withdrawAmountInput').value) || 0;
             const warningEl = document.getElementById('withdrawWarning');
+            const previewBtn = document.getElementById('previewWithdrawBtn');
+            const addressVal = document.getElementById('withdrawAddressInput').value;
+
             if (val > userWalletBalance) {
                 warningEl.classList.remove('hidden');
+                previewBtn.disabled = true;
+                previewBtn.className = "w-full py-3 rounded-xl bg-slate-800 text-slate-500 font-bold text-xs transition-all cursor-not-allowed mt-1";
+                return;
             } else {
                 warningEl.classList.add('hidden');
             }
-            validateWithdrawForm();
+
+            if (val > 0 && addressVal.trim().length > 5) {
+                previewBtn.disabled = false;
+                previewBtn.className = "w-full py-3 rounded-xl bg-amber-400 hover:bg-amber-500 text-slate-950 font-bold text-xs transition-all cursor-pointer mt-1";
+            } else {
+                previewBtn.disabled = true;
+                previewBtn.className = "w-full py-3 rounded-xl bg-slate-800 text-slate-500 font-bold text-xs transition-all cursor-not-allowed mt-1";
+            }
+        }
+
+        function validateWithdrawForm() {
+            handleWithdrawInput();
         }
 
         function setMaxWithdraw() {
             document.getElementById('withdrawAmountInput').value = userWalletBalance;
-            document.getElementById('withdrawWarning').classList.add('hidden');
-            validateWithdrawForm();
-        }
-
-        function validateWithdrawForm() {
-            const amount = parseFloat(document.getElementById('withdrawAmountInput').value) || 0;
-            const address = document.getElementById('withdrawAddressInput').value.trim();
-            const btn = document.getElementById('previewWithdrawBtn');
-
-            if (amount > 0 && amount <= userWalletBalance && address.length > 5) {
-                btn.disabled = false;
-                btn.className = "w-full py-3 rounded-xl bg-primary hover:bg-emerald-600 text-slate-950 font-bold text-xs transition-all cursor-pointer mt-1 shadow-lg";
-            } else {
-                btn.disabled = true;
-                btn.className = "w-full py-3 rounded-xl bg-slate-800 text-slate-500 font-bold text-xs transition-all cursor-not-allowed mt-1";
-            }
-        }
-
-        function pasteWithdrawAddress() {
-            if (navigator.clipboard && navigator.clipboard.readText) {
-                navigator.clipboard.readText().then(text => {
-                    document.getElementById('withdrawAddressInput').value = text.trim();
-                    validateWithdrawForm();
-                }).catch(() => {
-                    alert("Please paste manually.");
-                });
-            } else {
-                alert("Clipboard permissions not available.");
-            }
+            handleWithdrawInput();
         }
 
         function submitWithdrawal() {
-            alert('Withdrawal request successfully submitted!');
+            alert('Withdrawal request submitted successfully.');
             closeWithdrawModal();
+        }
+
+        function pasteWithdrawAddress() {
+            navigator.clipboard.readText().then(text => {
+                document.getElementById('withdrawAddressInput').value = text;
+                handleWithdrawInput();
+            }).catch(() => {
+                alert('Please paste address manually.');
+            });
         }
 
         function openCreateAdModal() {
@@ -1625,8 +1614,8 @@
 
         function submitNewAd() {
             const type = document.getElementById('newAdType').value;
-            const price = parseFloat(document.getElementById('newAdPrice').value) || 189;
-            const amount = parseFloat(document.getElementById('newAdAmount').value) || 50;
+            const price = parseFloat(document.getElementById('newAdPrice').value) || 189.00;
+            const amount = parseFloat(document.getElementById('newAdAmount').value) || 50.00;
 
             myAds.push({
                 id: Date.now(),
@@ -1638,7 +1627,6 @@
 
             closeCreateAdModal();
             renderMyAds();
-            alert('Ad published successfully!');
         }
 
         function renderMyAds() {
@@ -1647,20 +1635,20 @@
             container.innerHTML = '';
 
             if (myAds.length === 0) {
-                container.innerHTML = `<div class="bg-cardbg p-8 rounded-2xl border border-slate-800 text-center text-xs text-slate-400">You have no active ads. Post a new ad above.</div>`;
+                container.innerHTML = `<div class="bg-cardbg p-8 rounded-2xl border border-slate-800 text-center text-xs text-slate-400">You have no active ads posted.</div>`;
                 return;
             }
 
             myAds.forEach(ad => {
                 container.innerHTML += `
-                    <div class="bg-cardbg p-4 rounded-2xl border border-slate-800 space-y-3 text-xs shadow-md">
+                    <div class="bg-cardbg p-4 rounded-2xl border border-slate-800 space-y-2 text-xs shadow-md">
                         <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                            <span class="px-2.5 py-1 rounded-lg font-bold ${ad.type === 'buy' ? 'text-primary bg-emerald-500/10' : 'text-rose-400 bg-rose-500/10'} text-[11px] uppercase">${ad.type} USDT</span>
-                            <button onclick="openDeleteAdModal(${ad.id})" class="text-slate-400 hover:text-rose-400 p-1 cursor-pointer">Delete</button>
+                            <span class="px-2.5 py-1 rounded-lg font-bold uppercase text-[10px] ${ad.type === 'buy' ? 'bg-emerald-500/10 text-primary' : 'bg-rose-500/10 text-rose-400'}">${ad.type} USDT</span>
+                            <button onclick="openDeleteAdModal(${ad.id})" class="text-slate-400 hover:text-rose-400 cursor-pointer">Delete</button>
                         </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <div><span class="text-slate-500 text-[10px] uppercase block">Price</span><span class="text-white font-bold">${ad.price.toFixed(2)} ETB</span></div>
-                            <div><span class="text-slate-500 text-[10px] uppercase block">Amount</span><span class="text-primary font-bold">${ad.amount} USDT</span></div>
+                        <div class="grid grid-cols-2 gap-2 pt-1">
+                            <div><span class="text-slate-500 text-[10px] uppercase">Price</span><span class="text-white font-bold">${ad.price.toFixed(2)} ETB</span></div>
+                            <div><span class="text-slate-500 text-[10px] uppercase">Amount</span><span class="text-white font-bold">${ad.amount} USDT</span></div>
                         </div>
                     </div>`;
             });
@@ -1677,293 +1665,31 @@
         }
 
         function confirmDeleteAd() {
-            myAds = myAds.filter(a => a.id !== adToDeleteId);
+            if (adToDeleteId !== null) {
+                myAds = myAds.filter(ad => ad.id !== adToDeleteId);
+                renderMyAds();
+            }
             closeDeleteAdModal();
-            renderMyAds();
         }
 
         function sendChatMessage() {
             const input = document.getElementById('chatInput');
             const chatMessages = document.getElementById('chatMessages');
-            if (!input || !input.value.trim()) return;
+            if (!input.value.trim()) return;
 
-            const text = input.value.trim();
             chatMessages.innerHTML += `
-                <div class="bg-emerald-900/40 border border-emerald-500/30 p-2 rounded-lg max-w-[80%] ml-auto text-slate-200">
-                    <span class="font-bold text-primary block text-[10px]">Melaku Awoke (You)</span>
-                    ${text}
+                <div class="bg-slate-800 p-2 rounded-lg max-w-[80%] ml-auto text-slate-200">
+                    <span class="font-bold text-amber-400 block text-[10px]">You</span>
+                    ${input.value}
                 </div>`;
             input.value = '';
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        startOrderTimers();
-   <script>
-  window.addEventListener('DOMContentLoaded', async () => {
-    try {
-      // Get Telegram User ID or fallback
-      const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id || 'default_user';
-      
-      const response = await fetch(`/api/kyc/status?userId=${userId}`);
-      const data = await response.json();
-      
-      // If user already submitted KYC, switch directly to the pending screen
-      if (data.success && data.kycStatus === 'pending') {
-        // Hides landing elements and shows the pending screen
-        const landing = document.getElementById('landing-page') || document.querySelector('.landing-section');
-        const pending = document.getElementById('kyc-submitted-page') || document.querySelector('.pending-section');
-        
-        if (landing) landing.style.display = 'none';
-        if (pending) pending.style.display = 'block';
-      }
-    } catch (e) {
-      console.log('Status check skipped');
-    }
-  });
-</script> 
-function submitNewTicket() {
-    const category = document.getElementById('ticketCategory').value;
-    const subject = document.getElementById('ticketSubject').value.trim();
-    const message = document.getElementById('ticketMessage').value.trim();
-    if (!subject || !message) return;
-
-    const now = new Date();
-    const dateStr = (now.getMonth() + 1) + '/' + now.getDate() + '/' + now.getFullYear() + ', ' + now.toLocaleTimeString();
-    const randId = Math.floor(1000 + Math.random() * 9000);
-
-    supportTickets.unshift({
-        id: randId,
-        category,
-        subject,
-        message,
-        status: 'Open',
-        created: dateStr
-    });
-
-    closeCreateTicketModal();
-    renderSupportTickets();
-}
-
-function openAddPaymentModal() {
-    document.getElementById('accountNumberInput').value = '';
-    document.getElementById('phoneInput').value = '';
-    document.getElementById('savePaymentBtn').disabled = true;
-    document.getElementById('savePaymentBtn').className = "py-2.5 rounded-xl bg-slate-800 text-slate-500 font-bold text-xs cursor-not-allowed";
-    document.getElementById('addPaymentModal').classList.remove('hidden');
-}
-
-function closeAddPaymentModal() {
-    document.getElementById('addPaymentModal').classList.add('hidden');
-}
-
-function validateAddForm() {
-    const accNum = document.getElementById('accountNumberInput').value.trim();
-    const phone = document.getElementById('phoneInput').value.trim();
-    const btn = document.getElementById('savePaymentBtn');
-    if (accNum.length > 0 && phone.length > 0) {
-        btn.disabled = false;
-        btn.className = "py-2.5 rounded-xl bg-amber-400 hover:bg-amber-500 text-slate-950 font-bold text-xs cursor-pointer transition-all";
-    } else {
-        btn.disabled = true;
-        btn.className = "py-2.5 rounded-xl bg-slate-800 text-slate-500 font-bold text-xs cursor-not-allowed";
-    }
-}
-
-function saveNewPaymentMethod() {
-    const type = document.getElementById('paymentProviderSelect').value;
-    const name = document.getElementById('accountNameInput').value;
-    const accountNumber = document.getElementById('accountNumberInput').value.trim();
-    const phoneNumber = document.getElementById('phoneInput').value.trim();
-    if (!accountNumber || !phoneNumber) return;
-
-    paymentAccounts.push({
-        id: Date.now(),
-        type,
-        name,
-        accountNumber,
-        phoneNumber
-    });
-
-    closeAddPaymentModal();
-    renderPaymentAccounts();
-}
-
-function openDeleteModal(id) {
-    accountToDeleteId = id;
-    document.getElementById('deleteModal').classList.remove('hidden');
-}
-
-function closeDeleteModal() {
-    accountToDeleteId = null;
-    document.getElementById('deleteModal').classList.add('hidden');
-}
-
-function confirmDeleteAccount() {
-    if (accountToDeleteId !== null) {
-        paymentAccounts = paymentAccounts.filter(acc => acc.id !== accountToDeleteId);
-        renderPaymentAccounts();
-        closeDeleteModal();
-    }
-}
-
-function openCreateAdModal() {
-    document.getElementById('createAdModal').classList.remove('hidden');
-}
-
-function closeCreateAdModal() {
-    document.getElementById('createAdModal').classList.add('hidden');
-}
-
-function submitNewAd() {
-    const type = document.getElementById('newAdType').value;
-    const price = parseFloat(document.getElementById('newAdPrice').value) || 0;
-    const amount = parseFloat(document.getElementById('newAdAmount').value) || 0;
-    if (amount <= 0) return;
-
-    myAds.push({
-        id: Date.now(),
-        type,
-        price,
-        amount,
-        status: 'Active'
-    });
-
-    closeCreateAdModal();
-    renderMyAds();
-    switchNav('myAds');
-}
-
-function renderMyAds() {
-    const container = document.getElementById('myAdsListContainer');
-    if (!container) return;
-    container.innerHTML = '';
-    if (myAds.length === 0) {
-        container.innerHTML = `<div class="bg-cardbg p-8 rounded-2xl border border-slate-800 text-center text-xs text-slate-400">No active ads posted.</div>`;
-        return;
-    }
-    myAds.forEach(ad => {
-        container.innerHTML += `
-            <div class="bg-cardbg p-4 rounded-2xl border border-slate-800 space-y-2 text-xs">
-                <div class="flex justify-between items-center">
-                    <span class="px-2.5 py-1 rounded-lg font-bold ${ad.type === 'buy' ? 'text-primary bg-emerald-500/10' : 'text-rose-400 bg-rose-500/10'} text-[11px]">${ad.type.toUpperCase()} USDT</span>
-                    <button onclick="openDeleteAdModal(${ad.id})" class="text-slate-400 hover:text-rose-400 p-1 cursor-pointer">Delete Ad</button>
-                </div>
-                <div class="grid grid-cols-2 gap-2 pt-1">
-                    <div><span class="text-slate-500 text-[10px] uppercase block">Price</span><span class="text-white font-bold">${ad.price.toFixed(2)} ETB</span></div>
-                    <div><span class="text-slate-500 text-[10px] uppercase block">Amount</span><span class="text-slate-300 font-bold">${ad.amount} USDT</span></div>
-                </div>
-            </div>`;
-    });
-}
-
-function openDeleteAdModal(id) {
-    adToDeleteId = id;
-    document.getElementById('deleteAdModal').classList.remove('hidden');
-}
-
-function closeDeleteAdModal() {
-    adToDeleteId = null;
-    document.getElementById('deleteAdModal').classList.add('hidden');
-}
-
-function confirmDeleteAd() {
-    if (adToDeleteId !== null) {
-        myAds = myAds.filter(ad => ad.id !== adToDeleteId);
-        renderMyAds();
-        closeDeleteAdModal();
-    }
-}
-
-function openDepositModal() {
-    document.getElementById('depositModal').classList.remove('hidden');
-}
-
-function closeDepositModal() {
-    document.getElementById('depositModal').classList.add('hidden');
-}
-
-function copyAddress() {
-    const addr = document.getElementById('wallet-address').innerText;
-    navigator.clipboard.writeText(addr);
-    const copyText = document.getElementById('copy-text');
-    copyText.innerText = 'Copied!';
-    setTimeout(() => { copyText.innerText = 'Copy'; }, 2000);
-}
-
-function openWithdrawModal() {
-    document.getElementById('withdrawAmountInput').value = '';
-    document.getElementById('withdrawAddressInput').value = '';
-    document.getElementById('withdrawWarning').classList.add('hidden');
-    document.getElementById('previewWithdrawBtn').disabled = true;
-    document.getElementById('previewWithdrawBtn').className = "w-full py-3 rounded-xl bg-slate-800 text-slate-500 font-bold text-xs transition-all cursor-not-allowed mt-1";
-    document.getElementById('withdrawAvailableBalance').innerText = userWalletBalance.toFixed(2);
-    document.getElementById('withdrawModal').classList.remove('hidden');
-}
-
-function closeWithdrawModal() {
-    document.getElementById('withdrawModal').classList.add('hidden');
-}
-
-function setMaxWithdraw() {
-    document.getElementById('withdrawAmountInput').value = userWalletBalance;
-    handleWithdrawInput();
-}
-
-function handleWithdrawInput() {
-    const val = parseFloat(document.getElementById('withdrawAmountInput').value) || 0;
-    const warning = document.getElementById('withdrawWarning');
-    const btn = document.getElementById('previewWithdrawBtn');
-    const address = document.getElementById('withdrawAddressInput').value.trim();
-
-    if (val > userWalletBalance) {
-        warning.classList.remove('hidden');
-    } else {
-        warning.classList.add('hidden');
-    }
-
-    if (val > 0 && val <= userWalletBalance && address.length > 5) {
-        btn.disabled = false;
-        btn.className = "w-full py-3 rounded-xl bg-primary hover:bg-emerald-600 text-slate-950 font-bold text-xs transition-all cursor-pointer mt-1";
-    } else {
-        btn.disabled = true;
-        btn.className = "w-full py-3 rounded-xl bg-slate-800 text-slate-500 font-bold text-xs transition-all cursor-not-allowed mt-1";
-    }
-}
-
-function validateWithdrawForm() {
-    handleWithdrawInput();
-}
-
-function pasteWithdrawAddress() {
-    navigator.clipboard.readText().then(text => {
-        document.getElementById('withdrawAddressInput').value = text;
-        handleWithdrawInput();
-    }).catch(() => {});
-}
-
-function submitWithdrawal() {
-    alert('Withdrawal request submitted successfully!');
-    closeWithdrawModal();
-}
-
-function sendChatMessage() {
-    const input = document.getElementById('chatInput');
-    const msg = input.value.trim();
-    if (!msg) return;
-    const chatMessages = document.getElementById('chatMessages');
-    chatMessages.innerHTML += `
-        <div class="bg-primary/20 p-2 rounded-lg max-w-[80%] text-slate-200 ml-auto text-right">
-            <span class="font-bold text-primary block text-[10px]">You</span>
-            ${msg}
-        </div>`;
-    input.value = '';
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-}
-
-window.onload = function() {
-    startOrderTimers();
-    renderMarketplace();
-}; 
+        // Initialize background tasks
+        window.addEventListener('load', () => {
+            startOrderTimers();
+        });
     </script>
 </body>
 </html>
