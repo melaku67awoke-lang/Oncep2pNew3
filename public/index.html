@@ -1699,5 +1699,28 @@
 
         startOrderTimers();
     </script>
+   <script>
+  window.addEventListener('DOMContentLoaded', async () => {
+    try {
+      // Get Telegram User ID or fallback
+      const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id || 'default_user';
+      
+      const response = await fetch(`/api/kyc/status?userId=${userId}`);
+      const data = await response.json();
+      
+      // If user already submitted KYC, switch directly to the pending screen
+      if (data.success && data.kycStatus === 'pending') {
+        // Hides landing elements and shows the pending screen
+        const landing = document.getElementById('landing-page') || document.querySelector('.landing-section');
+        const pending = document.getElementById('kyc-submitted-page') || document.querySelector('.pending-section');
+        
+        if (landing) landing.style.display = 'none';
+        if (pending) pending.style.display = 'block';
+      }
+    } catch (e) {
+      console.log('Status check skipped');
+    }
+  });
+</script> 
 </body>
 </html>
