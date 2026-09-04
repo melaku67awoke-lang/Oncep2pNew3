@@ -14,7 +14,10 @@ module.exports = function(app) {
   const uploadKyc = multer({ storage: kycStorage });
 
   // Serve Uploads Statically So Images Render in Admin Dashboard
-  app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
+  app.use('/uploads', app.get('env') === 'production' 
+    ? require('express').static(path.join(__dirname, 'public', 'uploads')) 
+    : require('express').static(path.join(__dirname, 'public', 'uploads'))
+  );
 
   // User KYC Submission Endpoint
   app.post('/api/kyc/submit', uploadKyc.fields([{ name: 'idDocument', maxCount: 1 }, { name: 'selfie', maxCount: 1 }]), (req, res) => {
