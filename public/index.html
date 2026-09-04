@@ -1722,5 +1722,248 @@
     }
   });
 </script> 
+function submitNewTicket() {
+    const category = document.getElementById('ticketCategory').value;
+    const subject = document.getElementById('ticketSubject').value.trim();
+    const message = document.getElementById('ticketMessage').value.trim();
+    if (!subject || !message) return;
+
+    const now = new Date();
+    const dateStr = (now.getMonth() + 1) + '/' + now.getDate() + '/' + now.getFullYear() + ', ' + now.toLocaleTimeString();
+    const randId = Math.floor(1000 + Math.random() * 9000);
+
+    supportTickets.unshift({
+        id: randId,
+        category,
+        subject,
+        message,
+        status: 'Open',
+        created: dateStr
+    });
+
+    closeCreateTicketModal();
+    renderSupportTickets();
+}
+
+function openAddPaymentModal() {
+    document.getElementById('accountNumberInput').value = '';
+    document.getElementById('phoneInput').value = '';
+    document.getElementById('savePaymentBtn').disabled = true;
+    document.getElementById('savePaymentBtn').className = "py-2.5 rounded-xl bg-slate-800 text-slate-500 font-bold text-xs cursor-not-allowed";
+    document.getElementById('addPaymentModal').classList.remove('hidden');
+}
+
+function closeAddPaymentModal() {
+    document.getElementById('addPaymentModal').classList.add('hidden');
+}
+
+function validateAddForm() {
+    const accNum = document.getElementById('accountNumberInput').value.trim();
+    const phone = document.getElementById('phoneInput').value.trim();
+    const btn = document.getElementById('savePaymentBtn');
+    if (accNum.length > 0 && phone.length > 0) {
+        btn.disabled = false;
+        btn.className = "py-2.5 rounded-xl bg-amber-400 hover:bg-amber-500 text-slate-950 font-bold text-xs cursor-pointer transition-all";
+    } else {
+        btn.disabled = true;
+        btn.className = "py-2.5 rounded-xl bg-slate-800 text-slate-500 font-bold text-xs cursor-not-allowed";
+    }
+}
+
+function saveNewPaymentMethod() {
+    const type = document.getElementById('paymentProviderSelect').value;
+    const name = document.getElementById('accountNameInput').value;
+    const accountNumber = document.getElementById('accountNumberInput').value.trim();
+    const phoneNumber = document.getElementById('phoneInput').value.trim();
+    if (!accountNumber || !phoneNumber) return;
+
+    paymentAccounts.push({
+        id: Date.now(),
+        type,
+        name,
+        accountNumber,
+        phoneNumber
+    });
+
+    closeAddPaymentModal();
+    renderPaymentAccounts();
+}
+
+function openDeleteModal(id) {
+    accountToDeleteId = id;
+    document.getElementById('deleteModal').classList.remove('hidden');
+}
+
+function closeDeleteModal() {
+    accountToDeleteId = null;
+    document.getElementById('deleteModal').classList.add('hidden');
+}
+
+function confirmDeleteAccount() {
+    if (accountToDeleteId !== null) {
+        paymentAccounts = paymentAccounts.filter(acc => acc.id !== accountToDeleteId);
+        renderPaymentAccounts();
+        closeDeleteModal();
+    }
+}
+
+function openCreateAdModal() {
+    document.getElementById('createAdModal').classList.remove('hidden');
+}
+
+function closeCreateAdModal() {
+    document.getElementById('createAdModal').classList.add('hidden');
+}
+
+function submitNewAd() {
+    const type = document.getElementById('newAdType').value;
+    const price = parseFloat(document.getElementById('newAdPrice').value) || 0;
+    const amount = parseFloat(document.getElementById('newAdAmount').value) || 0;
+    if (amount <= 0) return;
+
+    myAds.push({
+        id: Date.now(),
+        type,
+        price,
+        amount,
+        status: 'Active'
+    });
+
+    closeCreateAdModal();
+    renderMyAds();
+    switchNav('myAds');
+}
+
+function renderMyAds() {
+    const container = document.getElementById('myAdsListContainer');
+    if (!container) return;
+    container.innerHTML = '';
+    if (myAds.length === 0) {
+        container.innerHTML = `<div class="bg-cardbg p-8 rounded-2xl border border-slate-800 text-center text-xs text-slate-400">No active ads posted.</div>`;
+        return;
+    }
+    myAds.forEach(ad => {
+        container.innerHTML += `
+            <div class="bg-cardbg p-4 rounded-2xl border border-slate-800 space-y-2 text-xs">
+                <div class="flex justify-between items-center">
+                    <span class="px-2.5 py-1 rounded-lg font-bold ${ad.type === 'buy' ? 'text-primary bg-emerald-500/10' : 'text-rose-400 bg-rose-500/10'} text-[11px]">${ad.type.toUpperCase()} USDT</span>
+                    <button onclick="openDeleteAdModal(${ad.id})" class="text-slate-400 hover:text-rose-400 p-1 cursor-pointer">Delete Ad</button>
+                </div>
+                <div class="grid grid-cols-2 gap-2 pt-1">
+                    <div><span class="text-slate-500 text-[10px] uppercase block">Price</span><span class="text-white font-bold">${ad.price.toFixed(2)} ETB</span></div>
+                    <div><span class="text-slate-500 text-[10px] uppercase block">Amount</span><span class="text-slate-300 font-bold">${ad.amount} USDT</span></div>
+                </div>
+            </div>`;
+    });
+}
+
+function openDeleteAdModal(id) {
+    adToDeleteId = id;
+    document.getElementById('deleteAdModal').classList.remove('hidden');
+}
+
+function closeDeleteAdModal() {
+    adToDeleteId = null;
+    document.getElementById('deleteAdModal').classList.add('hidden');
+}
+
+function confirmDeleteAd() {
+    if (adToDeleteId !== null) {
+        myAds = myAds.filter(ad => ad.id !== adToDeleteId);
+        renderMyAds();
+        closeDeleteAdModal();
+    }
+}
+
+function openDepositModal() {
+    document.getElementById('depositModal').classList.remove('hidden');
+}
+
+function closeDepositModal() {
+    document.getElementById('depositModal').classList.add('hidden');
+}
+
+function copyAddress() {
+    const addr = document.getElementById('wallet-address').innerText;
+    navigator.clipboard.writeText(addr);
+    const copyText = document.getElementById('copy-text');
+    copyText.innerText = 'Copied!';
+    setTimeout(() => { copyText.innerText = 'Copy'; }, 2000);
+}
+
+function openWithdrawModal() {
+    document.getElementById('withdrawAmountInput').value = '';
+    document.getElementById('withdrawAddressInput').value = '';
+    document.getElementById('withdrawWarning').classList.add('hidden');
+    document.getElementById('previewWithdrawBtn').disabled = true;
+    document.getElementById('previewWithdrawBtn').className = "w-full py-3 rounded-xl bg-slate-800 text-slate-500 font-bold text-xs transition-all cursor-not-allowed mt-1";
+    document.getElementById('withdrawAvailableBalance').innerText = userWalletBalance.toFixed(2);
+    document.getElementById('withdrawModal').classList.remove('hidden');
+}
+
+function closeWithdrawModal() {
+    document.getElementById('withdrawModal').classList.add('hidden');
+}
+
+function setMaxWithdraw() {
+    document.getElementById('withdrawAmountInput').value = userWalletBalance;
+    handleWithdrawInput();
+}
+
+function handleWithdrawInput() {
+    const val = parseFloat(document.getElementById('withdrawAmountInput').value) || 0;
+    const warning = document.getElementById('withdrawWarning');
+    const btn = document.getElementById('previewWithdrawBtn');
+    const address = document.getElementById('withdrawAddressInput').value.trim();
+
+    if (val > userWalletBalance) {
+        warning.classList.remove('hidden');
+    } else {
+        warning.classList.add('hidden');
+    }
+
+    if (val > 0 && val <= userWalletBalance && address.length > 5) {
+        btn.disabled = false;
+        btn.className = "w-full py-3 rounded-xl bg-primary hover:bg-emerald-600 text-slate-950 font-bold text-xs transition-all cursor-pointer mt-1";
+    } else {
+        btn.disabled = true;
+        btn.className = "w-full py-3 rounded-xl bg-slate-800 text-slate-500 font-bold text-xs transition-all cursor-not-allowed mt-1";
+    }
+}
+
+function validateWithdrawForm() {
+    handleWithdrawInput();
+}
+
+function pasteWithdrawAddress() {
+    navigator.clipboard.readText().then(text => {
+        document.getElementById('withdrawAddressInput').value = text;
+        handleWithdrawInput();
+    }).catch(() => {});
+}
+
+function submitWithdrawal() {
+    alert('Withdrawal request submitted successfully!');
+    closeWithdrawModal();
+}
+
+function sendChatMessage() {
+    const input = document.getElementById('chatInput');
+    const msg = input.value.trim();
+    if (!msg) return;
+    const chatMessages = document.getElementById('chatMessages');
+    chatMessages.innerHTML += `
+        <div class="bg-primary/20 p-2 rounded-lg max-w-[80%] text-slate-200 ml-auto text-right">
+            <span class="font-bold text-primary block text-[10px]">You</span>
+            ${msg}
+        </div>`;
+    input.value = '';
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+window.onload = function() {
+    startOrderTimers();
+    renderMarketplace();
+};    
 </body>
 </html>
