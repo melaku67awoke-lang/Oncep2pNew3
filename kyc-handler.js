@@ -1,8 +1,10 @@
 const multer = require('multer');
 const path = require('path');
 
+// Shared memory store across the app lifecycle
+global.db = global.db || { users: [], submissions: [] };
+
 module.exports = function(app) {
-  // Configure Multer for ID Document and Selfie Uploads
   const kycStorage = multer.diskStorage({
     destination: (req, file, cb) => {
       cb(null, path.join(__dirname, 'public', 'uploads'));
@@ -13,16 +15,14 @@ module.exports = function(app) {
   });
   const uploadKyc = multer({ storage: kycStorage });
 
-  // Serve Uploads Statically So Images Render in Admin Dashboard
   app.use('/uploads', require('express').static(path.join(__dirname, 'public', 'uploads')));
 
-  // User KYC Submission Endpoint
+  // User KYC Submission
   app.post('/api/kyc/submit', uploadKyc.fields([{ name: 'idDocument', maxCount: 1 }, { name: 'selfie', maxCount: 1 }]), (req, res) => {
     try {
-      global.db = global.db || { users: [] };
-      const userId = req.body.userId || 'user_' + Date.now();
+      const userId = req.body.userId || 'user_persistent_1';
       
-      let user = global.db.users.find(u => u.id == userId || u.kycStatus === 'pending');
+      let user = global.db.users.find(u => u.id == userId);
       if (!user) {
         user = { id: userId, tier: 1 };
         global.db.users.push(user);
@@ -51,29 +51,20 @@ module.exports = function(app) {
     }
   });
 
-  // Admin: Get KYC Submissions (Accepts any admin key to let you log in)
+  // Check user status endpoint so frontend knows if user is pending or approved when reopening
+  app.get('/api/kyc/status/:userId', (req, res) => {
+    const user = global.db.users.find(u => u.id == req.params.userId);
+    if (!user) return res.json({ kycStatus: 'none' });
+    res.json(user);
+  });
+
+  // Admin Get Submissions
   app.get('/api/admin/kyc', (req, res) => {
     try {
-      global.db = global.db || { users: [] };
-      
-      // If database is empty, provide a sample item so dashboard fields render right away
-      if (global.db.users.length === 0) {
-        global.db.users.push({
-          id: 'test_user_1',
-          fullName: 'Sample Applicant',
-          kycStatus: 'pending',
-          status: 'pending',
-          idNumber: 'AB123456',
-          idType: 'National ID',
-          idDocumentUrl: 'https://via.placeholder.com/140x90?text=ID+Card',
-          selfieUrl: 'https://via.placeholder.com/140x90?text=Selfie'
-        });
-      }
-
       const submissions = global.db.users.map(u => ({
         id: u.id || '1',
         userId: u.id || '1',
-        fullName: u.fullName || 'Test Applicant',
+        fullName: u.fullName || 'Applicant',
         status: u.kycStatus || u.status || 'pending',
         telegramId: u.telegramId || 'N/A',
         idNumber: u.idNumber || '123456',
@@ -89,19 +80,16 @@ module.exports = function(app) {
     }
   });
 
-  // Dummy routes for Wallet and Orders to prevent admin.html connection errors
   app.get('/api/admin/wallet-requests', (req, res) => res.json([]));
   app.get('/api/admin/orders', (req, res) => res.json([]));
 
-  // Admin: Review KYC (Approve / Reject)
+  // Admin Review (Approve/Reject)
   app.post('/api/admin/kyc/:id/review', (req, res) => {
     const { id } = req.params;
     const { status, reason } = req.body;
     
     try {
-      global.db = global.db || { users: [] };
       let user = global.db.users.find(u => u.id == id || u.userId == id);
-      
       if (!user) {
         user = { id, userId: id };
         global.db.users.push(user);
@@ -118,7 +106,7 @@ module.exports = function(app) {
         user.walletStatus = 'verified';
       }
 
-      res.json({ success: true, user });
+    res.json({ success: true, user });
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
